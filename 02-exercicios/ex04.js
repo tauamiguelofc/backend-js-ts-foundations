@@ -1,0 +1,1 @@
+//Use um for para imprimir os números de 1 a 50, mas sempre que o número for múltiplo de 5, imprima "Fizz" no lugar do número.//

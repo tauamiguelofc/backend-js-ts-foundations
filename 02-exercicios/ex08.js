@@ -1,0 +1,2 @@
+//Pegue o array de jogadores do exemplo (Ana, Bia, Caio) e use .reduce() para descobrir o total de kills de todos juntos. 
+//(Dica: a estrutura é array.reduce((acumulador, item) => acumulador + item.kills, 0)).
