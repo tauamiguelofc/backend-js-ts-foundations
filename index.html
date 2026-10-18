@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Foundations | DOCS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================= VARIÁVEIS E RESET ================= */
+        :root {
+            --bg: #0d1117; --bg-alt: #161b22; --card: rgba(22, 27, 34, 0.7);
+            --border: #30363d; --text: #c9d1d9; --muted: #8b949e;
+            --accent: #58a6ff; --accent-glow: rgba(88, 166, 255, 0.15);
+            --green: #3fb950; --red: #f85149; --purple: #bc8cff;
+            --font-main: 'Inter', sans-serif; --font-code: 'Fira Code', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-main); background-color: var(--bg); color: var(--text);
+            display: flex; line-height: 1.7; overflow-x: hidden;
+        }
+
+        /* Scrollbar Customizada */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+        /* ================= PROGRESS BAR ================= */
+        #progress-bar {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: linear-gradient(to right, var(--accent), var(--purple));
+            width: 0%; z-index: 1000; transition: width 0.1s;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 300px; height: 100vh; background-color: var(--bg-alt);
+            border-right: 1px solid var(--border); position: fixed;
+            padding: 2rem 1.5rem; overflow-y: auto; z-index: 10;
+        }
+
+        .sidebar-header h2 { color: #fff; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .sidebar-header span { background: var(--accent); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
+        .sidebar-header p { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; margin-top: 0.5rem; }
+
+        .nav-section { margin-bottom: 2rem; }
+        .nav-section h3 { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.8rem; padding-left: 0.5rem; }
+        .nav-links { list-style: none; }
+        .nav-links a {
+            color: var(--text); text-decoration: none; display: block;
+            padding: 0.5rem 0.8rem; border-radius: 6px; font-size: 0.9rem;
+            transition: all 0.2s; border-left: 2px solid transparent;
+        }
+        .nav-links a:hover { background: var(--bg); color: var(--accent); transform: translateX(4px); }
+        .nav-links a.active { background: var(--accent-glow); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+
+        /* ================= CONTEÚDO PRINCIPAL ================= */
+        .content { margin-left: 300px; padding: 4rem 5rem; max-width: 1050px; width: 100%; }
+
+        .hero { margin-bottom: 5rem; animation: fadeIn 1s ease-out; }
+        .hero h1 { color: #fff; font-size: 3rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 1rem; line-height: 1.2; }
+        .hero p { color: var(--muted); font-size: 1.2rem; max-width: 700px; }
+        
+        .tags { display: flex; gap: 10px; margin-top: 1.5rem; }
+        .tag { background: var(--bg-alt); border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; color: var(--accent); }
+
+        /* ================= CARDS ================= */
+        .card {
+            background: var(--card); backdrop-filter: blur(10px);
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 2.5rem; margin-bottom: 4rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s, border-color 0.3s;
+            opacity: 0; transform: translateY(30px); /* Para animação JS */
+        }
+        .card.visible { opacity: 1; transform: translateY(0); transition: all 0.6s ease-out; }
+        .card:hover { border-color: #484f58; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
+
+        .card h2 { color: #fff; font-size: 1.8rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px; }
+        .card h2 .number { color: var(--accent); font-family: var(--font-code); font-size: 1.2rem; background: var(--accent-glow); padding: 4px 10px; border-radius: 8px; }
+        
+        .context { margin-bottom: 1.5rem; font-size: 1.05rem; }
+        .context strong { color: #fff; }
+
+        .example-box {
+            background: linear-gradient(90deg, rgba(188, 140, 255, 0.1) 0%, transparent 100%);
+            border-left: 4px solid var(--purple); padding: 1.2rem;
+            border-radius: 0 8px 8px 0; margin: 2rem 0;
+        }
+        .example-box h3 { color: var(--purple); font-size: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px; }
+
+        /* ================= CÓDIGO ================= */
+        .code-container { position: relative; margin: 1.5rem 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+        .code-header { background: #010409; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .mac-dots { display: flex; gap: 6px; }
+        .mac-dots span { width: 12px; height: 12px; border-radius: 50%; }
+        .mac-dots .r { background: #ff5f56; } .mac-dots .y { background: #ffbd2e; } .mac-dots .g { background: #27c93f; }
+        .file-name { font-family: var(--font-code); font-size: 0.85rem; color: var(--muted); }
+
+        pre { background: #010409; padding: 1.5rem; overflow-x: auto; font-family: var(--font-code); font-size: 0.95rem; line-height: 1.5; }
+        
+        /* Cores do Código */
+        .k { color: #ff7b72; } /* Keyword */
+        .s { color: #a5d6ff; } /* String */
+        .n { color: #79c0ff; } /* Number */
+        .b { color: #ff7b72; } /* Boolean */
+        .c { color: #8b949e; font-style: italic; } /* Comment */
+        .f { color: #d2a8ff; } /* Function */
+        .o { color: #ff7b72; } /* Operator */
+        .p { color: #c9d1d9; } /* Punctuation */
+
+        .copy-btn {
+            background: #21262d; color: var(--text); border: 1px solid var(--border);
+            padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;
+            transition: 0.2s; display: flex; align-items: center; gap: 6px; font-family: var(--font-main);
+        }
+        .copy-btn:hover { background: #30363d; color: #fff; }
+        .copy-btn.success { background: rgba(63, 185, 80, 0.2); color: var(--green); border-color: var(--green); }
+
+        /* Terminal Output */
+        .output-box {
+            background: #000; border: 1px solid var(--border); border-radius: 8px;
+            padding: 1rem; font-family: var(--font-code); font-size: 0.9rem;
+            margin-top: -0.5rem; margin-bottom: 1.5rem; color: var(--muted);
+        }
+        .output-box span.term-title { color: var(--green); display: block; margin-bottom: 5px; font-weight: bold; }
+        .output-box span.result { color: #fff; }
+
+        /* ================= RESPONSIVIDADE ================= */
+        @media (max-width: 900px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: relative; padding: 1.5rem; border-right: none; border-bottom: 1px solid var(--border); }
+            .content { margin-left: 0; padding: 2rem; }
+            .hero h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="progress-bar"></div>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2>🚀 Backend Journey <span>v1.0</span></h2>
+            <p>Do zero ao Backend em JS/TS</p>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Fundamentos Teóricos</h3>
+            <ul class="nav-links">
+                <li><a href="#aula01">01. Variáveis e Escopo</a></li>
+                <li><a href="#aula02">02. Tipos e Operadores</a></li>
+                <li><a href="#aula03">03. Controle de Fluxo</a></li>
+                <li><a href="#aula04">04. Loops (Repetição)</a></li>
+                <li><a href="#aula05">05. Funções (Máquinas)</a></li>
+                <li><a href="#aula06">06. Arrays (Listas)</a></li>
+                <li><a href="#aula07">07. Objetos (Entidades)</a></li>
+                <li><a href="#aula08">08. Higher-Order Functions</a></li>
+                <li><a href="#aula09">09. Try/Catch (Erros)</a></li>
+                <li><a href="#aula10">10. Async/Await</a></li>
+            </ul>
+        </div>
+
+        <div class="nav-section">
+            <h3>Desafios Práticos</h3>
+            <ul class="nav-links">
+                <li><a href="#ex01">Ex 01. Ficha de Jogador</a></li>
+                <li><a href="#ex02">Ex 02. Cálculo de Dano</a></li>
+                <li><a href="#ex03">Ex 03. Rank de Notas</a></li>
+                <li><a href="#ex04">Ex 04. FizzBuzz Gamer</a></li>
+                <li><a href="#ex05">Ex 05. Imposto de Renda</a></li>
+                <li><a href="#ex06">Ex 06. Média de Partidas</a></li>
+                <li><a href="#ex07">Ex 07. Engine de Carro</a></li>
+                <li><a href="#ex08">Ex 08. Total de Kills</a></li>
+                <li><a href="#ex09">Ex 09. Validação de Lobby</a></li>
+                <li><a href="#ex10">Ex 10. Fetch API (Simulado)</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="content">
+        <section class="hero">
+            <div class="tags">
+                <span class="tag">JavaScript</span>
+                <span class="tag">TypeScript (Em breve)</span>
+                <span class="tag">Node.js</span>
+            </div>
+            <h1>Backend Foundations: A Base Sólida</h1>
+            <p>Documentando minha transição de Engenharia Química para o Desenvolvimento Backend. Foco em lógica de programação, resolução de problemas e arquitetura de sistemas.</p>
+        </section>
+
+        <!-- ================= AULAS ================= -->
+
+        <section id="aula01" class="card">
+            <h2><span class="number">01</span> Variáveis e Escopo</h2>
+            <div class="context">
+                <p><strong>Conceito:</strong> Variáveis são espaços alocados na memória para guardar dados temporários. Usamos <code>const</code> (imutável) e <code>let</code> (mutável). <code>var</code> caiu em desuso por problemas de escopo.</p>
+            </div>
+            <div class="example-box">
+                <h3>🌍 Assimilação Real</h3>
+                <p>Pense no inventário de um jogo. <strong>const:</strong> É a sua classe de personagem (Você escolheu Mago, não pode mudar no meio da partida). <strong>let:</strong> É a sua barra de HP (Pode subir ao tomar poção ou descer ao levar dano).</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+                    <span class="file-name">aula01.js</span>
+                    <button class="copy-btn"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copiar</button>
+                </div>
+                <pre><code><span class="c">// A classe nunca muda</span>
+<span class="k">const</span> classe = <span class="s">"Mago"</span>;
+
+<span class="c">// O HP é dinâmico</span>
+<span class="k">let</span> hp = <span class="n">100</span>;
+hp = hp - <span class="n">30</span>; <span class="c">// Tomou dano, agora é 70</span>
+
+console.<span class="f">log</span>(<span class="s">`Classe: <span class="o">${</span>classe<span class="o">}</span> | HP Atual: <span class="o">${</span>hp<span class="o">}</span>`</span>);</code></pre>
+            </div>
+            <div class="output-box">
+                <span class="term-title">$ node aula01.js</span>
+                <span class="result">Classe: Mago | HP Atual: 70</span>
+            </div>
+        </section>
+
+        <section id="aula02" class="card">
+            <h2><span class="number">02</span> Tipos e Operadores</h2>
+            <div class="context">
+                <p><strong>Conceito:</strong> O JS não é fortemente tipado (por isso usamos TypeScript depois). Se você somar uma string com número, ele concatena (junta). Operadores matemáticos (<code>+ - * / %</code>) seguem a precedência da matemática.</p>
+            </div>
+            <div class="example-box">
+                <h3>🌍 Assimilação Real</h3>
+                <p>Se a API do jogo te manda o dano como texto <code>"50"</code> e você soma com a defesa <code>20</code>, o jogador vai levar <code>"5020"</code> de dano e bugar o servidor. Sempre converta com <code>Number()</code>.</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+                    <span class="file-name">aula02.js</span>
+                    <button class="copy-btn">Copiar</button>
+                </div>
+                <pre><code><span class="k">const</span> danoString = <span class="s">"50"</span>; <span class="c">// Veio da API</span>
+<span class="k">const</span> defesa = <span class="n">20</span>;
+
+<span class="c">// A armadilha:</span>
+console.<span class="f">log</span>(danoString + defesa); <span class="c">// "5020" (Bug!)</span>
+
+<span class="c">// A solução: Converter e calcular</span>
+<span class="k">const</span> danoReal = <span class="f">Number</span>(danoString) - defesa;
+console.<span class="f">log</span>(danoReal); <span class="c">// 30</span></code></pre>
+            </div>
+            <div class="output-box">
+                <span class="term-title">$ node aula02.js</span>
+                <span class="result">5020<br>30</span>
+            </div>
+        </section>
+
+        <section id="aula03" class="card">
+            <h2><span class="number">03</span> Controle de Fluxo (Condicionais)</h2>
+            <div class="context">
+                <p><strong>Conceito:</strong> O cérebro do código. Usamos <code>if</code> (se), <code>else if</code> (senão, se) e <code>else</code> (senão). Combinados com operadores lógicos: <code>&&</code> (E) e <code>||</code> (OU).</p>
+            </div>
+            <div class="example-box">
+                <h3>🌍 Assimilação Real</h3>
+                <p><strong>Matchmaking:</strong> Para entrar numa partida ranqueada, o jogador precisa ter Nível >= 10 <strong>E</strong> (&&) ter o jogo original comprado. Se ele não cumprir, cai no <code>else</code> e recebe um bloqueio.</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+                    <span class="file-name">aula03.js</span>
+                    <button class="copy-btn">Copiar</button>
+                </div>
+                <pre><code><span class="k">const</span> nivel = <span class="n">15</span>;
+<span class="k">const</span> temJogoOriginal = <span class="b">true</span>;
+
+<span class="k">if</span> (nivel >= <span class="n">10</span> <span class="o">&&</span> temJogoOriginal) {
+    console.<span class="f">log</span>(<span class="s">"✅ Entrando na fila Ranqueada..."</span>);
+} <span class="k">else</span> {
+    console.<span class="f">log</span>(<span class="s">"❌ Acesso negado. Jogue Casual primeiro."</span>);
+}</code></pre>
+            </div>
+            <div class="output-box">
+                <span class="term-title">$ node aula03.js</span>
+                <span class="result">✅ Entrando na fila Ranqueada...</span>
+            </div>
+        </section>
+
+        <section id="aula04" class="card">
+            <h2><span class="number">04</span> Loops (A Repetição)</h2>
+            <div class="context">
+                <p><strong>Conceito:</strong> Automação. O <code>for</code> itera um número conhecido de vezes. O <code>while</code> roda até a condição falhar. O <code>for...of</code> é usado para percorrer listas.</p>
+            </div>
+            <div class="example-box">
+                <h3>🌍 Assimilação Real</h3>
+                <p>Imagine que você precisa spawnar 5 inimigos em um mapa de tower defense. Em vez de escrever `spawnarInimigo()` 5 vezes, você usa um loop <code>for</code> que chama a função 5 vezes de forma automática.</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+                    <span class="file-name">aula04.js</span>
+                    <button class="copy-btn">Copiar</button>
+                </div>
+                <pre><code><span class="c">// Loop para contar inimigos restantes</span>
+<span class="k">for</span> (<span class="k">let</span> i = <span class="n">1</span>; i <= <span class="n">3</span>; i++) {
+    console.<span class="f">log</span>(<span class="s">`Inimigo <span class="o">${</span>i<span class="o">}</span> spawnado na arena!`</span>);
+}</code></pre>
+            </div>
+            <div class="output-box">
+                <span class="term-title">$ node aula04.js</span>
+                <span class="result">Inimigo 1 spawnado na arena!<br>Inimigo 2 spawnado na arena!<br>Inimigo 3 spawnado na arena!</span>
+            </div>
+        </section>
+
+        <section id="aula05" class="card">
+            <h2><span class="number">05</span> Funções (As Máquinas)</h2>
+            <div class="context">
+                <p><strong>Conceito:</strong> Funções são blocos de código que só rodam quando chamados. Elas podem receber parâmetros e devolver um valor com <code>return</code>. Arrow functions (<code>=></code>) são a forma moderna.</p>
+            </div>
+            <div class="example-box">
+                <h3>🌍 Assimilação Real</h3>
+                <p>Uma função é como a fórmula de dano do LOL ou CS. Você passa os atributos (Ataque, Defesa do alvo) e a função processa, aplicando a matemática, e te devolve o dano final. Se você mudar a fórmula, muda em um lugar só.</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+                    <span class="file-name">aula05.js</span>
+                    <button class="copy-btn">Copiar</button>
+                </div>
+                <pre><code><span class="c">// Arrow function para calcular dano crítico</span>
+<span class="k">const</span> calcularDano = (ataque, multiplicador) <span class="k">=></span> {
+    <span class="k">return</span> ataque * multiplicador;
+};
+
+<span class="k">const</span> danoCritico = <span class="f">calcularDano</span>(<span class="n">100</span>, <span class="n">2.5</span>); <span class="c">// 100 base, 2.5x crítico</span>
+console.<span class="f">log</span>(<span class="s">`💥 Dano Crítico: <span class="o">${</span>danoCritico<span class="o">}</span>`</span>);</code></pre>
+            </div>
+            <div class="output-box">
+                <span class="term-title">$ node aula05.js</span>
+                <span class="result">💥 Dano Crítico: 250</span>
+            </div>
+        </section>
+
+        <section id="aula06" class="card">
+            <h2><span class="number">06</span> Arrays (Listas de Dados)</h2>
+            <div class="context">
+                <p><strong>Conceito:</strong> Estruturas indexadas (começam no 0) que guardam múltiplos valores. Métodos essenciais: <code>.push()</code> (adicionar), <code>.pop()</code> (remover final), <code>.length</code> (tamanho).</p>
+            </div>
+            <div class="example-box">
+                <h3>🌍 Assimilação Real</h3>
+                <p>O array é o inventário do jogador. O item no index 0 é a primeira arma. Quando você pega um novo loot, você dá um <code>.push()</code>. Se o inventário enche (atinge o <code>.length</code> máximo), você precisa dropar algo.</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+                    <span class="file-name">aula06.js</span>
+                    <button class="copy-btn">Copiar</button>
+                </div>
+                <pre><code><span class="k">const</span> inventario = [<span class="s">"Faca"</span>, <span class="s">"Pistola"</span>];
+inventario.<span class="f">push</span>(<span class="s">"Rifle"</span>); <span class="c">// Adiciona no final</span>
+
+console.<span class="f">log</span>(<span class="s">`Itens: <span class="o">${</span>inventario<span class="o">}</span>`</span>);
+console.<span class="f">log</span>(<span class="s">`Primeiro item: <span class="o">${</span>inventario[<span class="n">0</span>]<span class="o">}</span>`</span>);</code></pre>
+            </div>
+            <div class="output-box">
+                <span class="term-title">$ node aula06.js</span>
+                <span class="result">Itens: Faca,Pistola,Rifle<br>Primeiro item: Faca</span>
+            </div>
+        </section>
+
+        <section id="aula07" class="card">
+            <h2><span class="number">07</span> Objetos (Entidades)</h2>
+            <div class="context">
+                <p><strong>Conceito:</strong> Agrupam propriedades (chave-valor). São a representação de entidades do mundo real no código (um Jogador, uma Arma, uma Partida). Acessados via <code>obj.chave</code>.</p>
+            </div>
+            <div class="example-box">
+                <h3>🌍 Assimilação Real</h3>
+                <p>Uma API de jogo não te devolve o jogador como um array solto. Ela te devolve um Objeto: <code>{ id: 1, nome: "Faker", elo: "Desafiante" }</code>. O objeto tem nome para cada informação.</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+                    <span class="file-name">aula07.js</span>
+                    <button class="copy-btn">Copiar</button>
+                </div>
+                <pre><code><span class="k">const</span> jogador = {
+    nick: <span class="s">"Faker"</span>,
+    funcao: <span class="s">"Mid"</span>,
+    campeao: <span class="s">"Azir"</span>
+};
+
+console.<span class="f">log</span>(<span class="s">`O jogador <span class="o">${</span>jogador.nick<span class="o">}</span> joga de <span class="o">${</span>jogador.funcao<span class="o">}</span> com o <span class="o">${</span>jogador.campeao<span class="o">}</span>.`</span>);</code></pre>
+            </div>
+            <div class="output-box">
+                <span class="term-title">$ node aula07.js</span>
+                <span class="result">O jogador Faker joga de Mid com o Azir.</span>
+            </div>
+        </section>
+
+        <section id="aula08" class="card">
+            <h2><span class="number">08</span> Higher-Order Functions</h2>
+            <div class="context">
+                <p><strong>Conceito:</strong> O segredo do backend moderno. <code>.map()</code> transforma um array em outro. <code>.filter()</code> cria um novo array apenas com os itens que passam num teste. <code>.reduce()</code> transforma o array em um único valor.</p>
+            </div>
+            <div class="example-box">
+                <h3>🌍 Assimilação Real</h3>
+                <p>Se você tem a lista de todos os jogadores da partida, o <code>.filter()</code> é o que a Riot usa para pegar apenas os jogadores que deram "Report" por cheat. O <code>.map()</code> é usado para pegar apenas os nomes (strings) desses jogadores.</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+                    <span class="file-name">aula08.js</span>
+                    <button class="copy-btn">Copiar</button>
+                </div>
+                <pre><code><span class="k">const</span> jogadores = [
+    { nome: <span class="s">"Ana"</span>, kda: <span class="n">1.2</span> },
+    { nome: <span class="s">"Hacker"</span>, kda: <span class="n">15.0</span> } <span class="c">// Suspeito!</span>
+];
+
+<span class="c">// Filtra jogadores com KDA maior que 10</span>
+<span class="k">const</span> suspeitos = jogadores.<span class="f">filter</span>(j <span class="k">=></span> j.kda > <span class="n">10</span>);
+
+<span class="c">// Pega apenas os nomes dos suspeitos</span>
+<span class="k">const</span> nomesSuspeitos = suspeitos.<span class="f">map</span>(j <span class="k">=></span> j.nome);
+
+console.<span class="f">log</span>(nomesSuspeitos);</code></pre>
+            </div>
+            <div class="output-box">
+                <span class="term-title">$ node aula08.js</span>
+                <span class="result">[ 'Hacker' ]</span>
+            </div>
+        </section>
+
+        <section id="aula09" class="card">
+            <h2><span class="number">09</span> Try/Catch (Gestão de Erros)</h2>
+            <div class="context">
+                <p><strong>Conceito:</strong> Se um erro ocorrer, o programa inteiro não pode cair. O <code>try</code> tenta rodar o código. Se der erro, o <code>catch</code> intercepta e evita o crash. Usamos <code>throw new Error()</code> para forçar um erro.</p>
+            </div>
+            <div class="example-box">
+                <h3>🌍 Assimilação Real</h3>
+                <p>Você está lendo um arquivo JSON de save do jogo. Se o arquivo estiver corrompido, sem o try/catch o servidor cai (DDoS acidental). Com o try/catch, ele lê, vê que deu erro, e retorna uma mensagem amigável pro jogador.</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+                    <span class="file-name">aula09.js</span>
+                    <button class="copy-btn">Copiar</button>
+                </div>
+                <pre><code><span class="k">function</span> <span class="f">comprarItem</span>(preco, saldo) {
+    <span class="k">if</span> (preco > saldo) {
+        <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">"Saldo insuficiente para compra!"</span>);
+    }
+    <span class="k">return</span> <span class="s">"Compra realizada"</span>;
+}
+
+<span class="k">try</span> {
+    <span class="f">comprarItem</span>(<span class="n">500</span>, <span class="n">200</span>);
+} <span class="k">catch</span> (erro) {
+    console.<span class="f">log</span>(<span class="s">`❌ Falha: <span class="o">${</span>erro.message<span class="o">}</span>`</span>);
+}</code></pre>
+            </div>
+            <div class="output-box">
+                <span class="term-title">$ node aula09.js</span>
+                <span class="result">❌ Falha: Saldo insuficiente para compra!</span>
+            </div>
+        </section>
+
+        <section id="aula10" class="card">
+            <h2><span class="number">10</span> Async / Await (Promises)</h2>
+            <div class="context">
+                <p><strong>Conceito:</strong> O JavaScript não espera requisições terminarem (single-thread). Se você buscar dados do banco, o código continua rodando. O <code>await</code> pausa a função <code>async</code> até a Promise retornar sucesso ou falha.</p>
+            </div>
+            <div class="example-box">
+                <h3>🌍 Assimilação Real</h3>
+                <p>Quando você clica em "Entrar na Partida", o servidor da Riot precisa verificar seu login, seu elo, e te alocar numa sala. Isso demora 1-2 segundos. O navegador não pode congelar. Ele segura a requisição com <code>await</code>, e o resto do site continua clicável.</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+                    <span class="file-name">aula10.js</span>
+                    <button class="copy-btn">Copiar</button>
+                </div>
+                <pre><code><span class="c">// Simula uma API lenta</span>
+<span class="k">function</span> <span class="f">buscarRanking</span>() {
+    <span class="k">return new</span> <span class="f">Promise</span>(resolve <span class="k">=></span> {
+        <span class="f">setTimeout</span>(() <span class="k">=></span> <span class="f">resolve</span>({ elo: <span class="s">"Desafiante"</span>, pontos: <span class="n">1200</span> }), <span class="n">1500</span>);
+    });
+}
+
+<span class="k">async function</span> <span class="f">carregarPerfil</span>() {
+    console.<span class="f">log</span>(<span class="s">"Buscando dados na API..."</span>);
+    <span class="k">const</span> dados = <span class="k">await</span> <span class="f">buscarRanking</span>(); <span class="c">// Pausa aqui e espera 1.5s</span>
+    console.<span class="f">log</span>(<span class="s">`Elo: <span class="o">${</span>dados.elo<span class="o">}</span> | LP: <span class="o">${</span>dados.pontos<span class="o">}</span>`</span>);
+}
+
+<span class="f">carregarPerfil</span>();</code></pre>
+            </div>
+            <div class="output-box">
+                <span class="term-title">$ node aula10.js</span>
+                <span class="result">Buscando dados na API...<br><i>(espera 1.5s)</i><br>Elo: Desafiante | LP: 1200</span>
+            </div>
+        </section>
+
+        <!-- ================= EXERCÍCIOS ================= -->
+
+        <section id="ex01" class="card">
+            <h2><span class="number">EX 01</span> Ficha de Jogador</h2>
+            <div class="context"><p>Crie variáveis com nome, idade e jogo favorito e imprima uma string interpolada.</p></div>
+            <div class="code-container">
+                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex01.js</span><button class="copy-btn">Copiar</button></div>
+                <pre><code><span class="k">const</span> nick = <span class="s">"Tauã"</span>;
+<span class="k">const</span> rank = <span class="s">"Global Elite"</span>;
+console.<span class="f">log</span>(<span class="s">`O jogador <span class="o">${</span>nick<span class="o">}</span> está no rank <span class="o">${</span>rank<span class="o">}</span>.`</span>);</code></pre>
+            </div>
+            <div class="output-box"><span class="term-title">$ node ex01.js</span><span class="result">O jogador Tauã está no rank Global Elite.</span></div>
+        </section>
+
+        <section id="ex02" class="card">
+            <h2><span class="number">EX 02</span> Cálculo de Dano</h2>
+            <div class="context"><p>Calcule dano (ataque - defesa). Se for negativo, retorne "Bloqueado".</p></div>
+            <div class="code-container">
+                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex02.js</span><button class="copy-btn">Copiar</button></div>
+                <pre><code><span class="k">const</span> ataque = <span class="n">50</span>; <span class="k">const</span> defesa = <span class="n">80</span>;
+<span class="k">const</span> dano = ataque - defesa;
+
+<span class="k">if</span> (dano <span class="o"><=</span> <span class="n">0</span>) {
+    console.<span class="f">log</span>(<span class="s">"Dano Bloqueado"</span>);
+} <span class="k">else</span> {
+    console.<span class="f">log</span>(<span class="s">`Dano de <span class="o">${</span>dano<span class="o">}</span>`</span>);
+}</code></pre>
+            </div>
+            <div class="output-box"><span class="term-title">$ node ex02.js</span><span class="result">Dano Bloqueado</span></div>
+        </section>
+
+        <section id="ex03" class="card">
+            <h2><span class="number">EX 03</span> Rank de Notas</h2>
+            <div class="context"><p>Notas >= 9 (MVP), >= 7 (Bom), resto (Treinar).</p></div>
+            <div class="code-container">
+                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex03.js</span><button class="copy-btn">Copiar</button></div>
+                <pre><code><span class="k">const</span> nota = <span class="n">8.5</span>;
+<span class="k">if</span> (nota >= <span class="n">9</span>) console.<span class="f">log</span>(<span class="s">"MVP"</span>);
+<span class="k">else if</span> (nota >= <span class="n">7</span>) console.<span class="f">log</span>(<span class="s">"Bom Jogador"</span>);
+<span class="k">else</span> console.<span class="f">log</span>(<span class="s">"Precisa treinar"</span>);</code></pre>
+            </div>
+            <div class="output-box"><span class="term-title">$ node ex03.js</span><span class="result">Bom Jogador</span></div>
+        </section>
+
+        <section id="ex04" class="card">
+            <h2><span class="number">EX 04</span> FizzBuzz Gamer</h2>
+            <div class="context"><p>Loop de 1 a 50. Múltiplos de 5 imprimem "Fizz".</p></div>
+            <div class="code-container">
+                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex04.js</span><button class="copy-btn">Copiar</button></div>
+                <pre><code><span class="k">for</span> (<span class="k">let</span> i = <span class="n">1</span>; i <= <span class="n">50</span>; i++) {
+    <span class="k">if</span> (i % <span class="n">5</span> === <span class="n">0</span>) console.<span class="f">log</span>(<span class="s">"Fizz"</span>);
+    <span class="k">else</span> console.<span class="f">log</span>(i);
+}</code></pre>
+            </div>
+            <div class="output-box"><span class="term-title">$ node ex04.js</span><span class="result">1, 2, 3, 4, Fizz, 6, 7, 8, 9, Fizz...</span></div>
+        </section>
+
+        <section id="ex05" class="card">
+            <h2><span class="number">EX 05</span> Imposto de Renda</h2>
+            <div class="context"><p>Função que calcula 15% se salário > 3000.</p></div>
+            <div class="code-container">
+                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex05.js</span><button class="copy-btn">Copiar</button></div>
+                <pre><code><span class="k">const</span> calcularIR = (salario) <span class="k">=></span> salario > <span class="n">3000</span> ? salario * <span class="n">0.15</span> : <span class="n">0</span>;
+console.<span class="f">log</span>(<span class="f">calcularIR</span>(<span class="n">5000</span>));</code></pre>
+            </div>
+            <div class="output-box"><span class="term-title">$ node ex05.js</span><span class="result">750</span></div>
+        </section>
+
+        <section id="ex06" class="card">
+            <h2><span class="number">EX 06</span> Média de Partidas</h2>
+            <div class="context"><p>Array de notas, loop e cálculo de média.</p></div>
+            <div class="code-container">
+                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex06.js</span><button class="copy-btn">Copiar</button></div>
+                <pre><code><span class="k">const</span> notas = [<span class="n">10</span>, <span class="n">5</span>, <span class="n">8</span>, <span class="n">2</span>, <span class="n">9</span>];
+<span class="k">let</span> soma = <span class="n">0</span>;
+<span class="k">for</span> (<span class="k">let</span> n <span class="k">of</span> notas) soma += n;
+console.<span class="f">log</span>(<span class="s">`Média: <span class="o">${</span>soma / notas.length<span class="o">}</span>`</span>);</code></pre>
+            </div>
+            <div class="output-box"><span class="term-title">$ node ex06.js</span><span class="result">Média: 6.8</span></div>
+        </section>
+
+        <section id="ex07" class="card">
+            <h2><span class="number">EX 07</span> Engine de Carro</h2>
+            <div class="context"><p>Objeto carro, alterar boolean `ligado` e imprimir.</p></div>
+            <div class="code-container">
+                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex07.js</span><button class="copy-btn">Copiar</button></div>
+                <pre><code><span class="k">const</span> carro = { marca: <span class="s">"Ford"</span>, ligado: <span class="b">false</span> };
+carro.ligado = <span class="b">true</span>;
+console.<span class="f">log</span>(<span class="s">"Carro ligado"</span>);</code></pre>
+            </div>
+            <div class="output-box"><span class="term-title">$ node ex07.js</span><span class="result">Carro ligado</span></div>
+        </section>
+
+        <section id="ex08" class="card">
+            <h2><span class="number">EX 08</span> Total de Kills (Reduce)</h2>
+            <div class="context"><p>Usar `.reduce()` para acumular total de kills.</p></div>
+            <div class="code-container">
+                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex08.js</span><button class="copy-btn">Copiar</button></div>
+                <pre><code><span class="k">const</span> team = [{k: <span class="n">10</span>}, {k: <span class="n">20</span>}, {k: <span class="n">15</span>}];
+<span class="k">const</span> total = team.<span class="f">reduce</span>((acc, p) <span class="k">=></span> acc + p.k, <span class="n">0</span>);
+console.<span class="f">log</span>(total);</code></pre>
+            </div>
+            <div class="output-box"><span class="term-title">$ node ex08.js</span><span class="result">45</span></div>
+        </section>
+
+        <section id="ex09" class="card">
+            <h2><span class="number">EX 09</span> Validação de Lobby</h2>
+            <div class="context"><p>Lançar erro se `hp` não existir, capturar com try/catch.</p></div>
+            <div class="code-container">
+                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex09.js</span><button class="copy-btn">Copiar</button></div>
+                <pre><code><span class="k">try</span> {
+    <span class="k">const</span> player = { nome: <span class="s">"Noob"</span> }; <span class="c">// Sem HP</span>
+    <span class="k">if</span> (!player.hp) <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">"Jogador inválido"</span>);
+} <span class="k">catch</span> (e) {
+    console.<span class="f">log</span>(e.message);
+}</code></pre>
+            </div>
+            <div class="output-box"><span class="term-title">$ node ex09.js</span><span class="result">Jogador inválido</span></div>
+        </section>
+
+        <section id="ex10" class="card">
+            <h2><span class="number">EX 10</span> Fetch API (Simulado)</h2>
+            <div class="context"><p>Async/await com setTimeout e Promise.</p></div>
+            <div class="code-container">
+                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex10.js</span><button class="copy-btn">Copiar</button></div>
+                <pre><code><span class="k">const</span> getUser = () <span class="k">=></span> <span class="k">new</span> <span class="f">Promise</span>(r <span class="k">=></span> <span class="f">setTimeout</span>(() <span class="k">=></span> <span class="f">r</span>({ nick: <span class="s">"Faker"</span> }), <span class="n">1000</span>));
+
+<span class="k">async function</span> <span class="f">main</span>() {
+    <span class="k">const</span> user = <span class="k">await</span> <span class="f">getUser</span>();
+    console.<span class="f">log</span>(user.nick);
+}
+<span class="f">main</span>();</code></pre>
+            </div>
+            <div class="output-box"><span class="term-title">$ node ex10.js</span><span class="result">Faker <i>(após 1s)</i></span></div>
+        </section>
+
+        <footer style="text-align: center; color: var(--muted); padding: 2rem 0; border-top: 1px solid var(--border); margin-top: 4rem;">
+            <p>Desenvolvido por Tauã Miguel | Transição de Carreira | 2026</p>
+        </footer>
+    </main>
+
+    <script>
+        // ================= 1. BARRA DE PROGRESSO =================
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-bar").style.width = scrolled + "%";
+        };
+
+        // ================= 2. ANIMAÇÃO FADE-IN (SCROLL REVEAL) =================
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // ================= 3. SCROLLSPY (MENU ATIVO) =================
+        const sections = document.querySelectorAll('section');
+        const navLi = document.querySelectorAll('.nav-links a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLi.forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href') === '#' + current) {
+                    a.classList.add('active');
+                }
+            });
+        });
+
+        // ================= 4. BOTÃO COPIAR CÓDIGO =================
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const codeBlock = this.closest('.code-container').querySelector('code');
+                const textToCopy = codeBlock.innerText;
+                
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '✓ Copiado';
+                    this.classList.add('success');
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.classList.remove('success');
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
