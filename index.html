@@ -1,707 +1,617 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backend Foundations | DOCS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <title>Fundamentos JS/TS | Plataforma de Ensino</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
+    <!-- PRISM.JS: Motor de cores do código -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
     <style>
-        /* ================= VARIÁVEIS E RESET ================= */
+        /* ================= TEMAS (Dark e Light) ================= */
         :root {
-            --bg: #0d1117; --bg-alt: #161b22; --card: rgba(22, 27, 34, 0.7);
-            --border: #30363d; --text: #c9d1d9; --muted: #8b949e;
-            --accent: #58a6ff; --accent-glow: rgba(88, 166, 255, 0.15);
-            --green: #3fb950; --red: #f85149; --purple: #bc8cff;
-            --font-main: 'Inter', sans-serif; --font-code: 'Fira Code', monospace;
+            /* Tema Dark (Padrão) */
+            --bg-base: #09090b; --bg-surface: #18181b; --bg-surface-hover: #27272a;
+            --border: #27272a; --primary: #6366f1; --primary-hover: #4f46e5;
+            --primary-glow: rgba(99, 102, 241, 0.15); --text-main: #f4f4f5;
+            --text-muted: #a1a1aa; --success: #10b981; --danger: #ef4444;
+            --font-main: 'Inter', sans-serif; --font-code: 'JetBrains Mono', monospace;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
-
-        body {
-            font-family: var(--font-main); background-color: var(--bg); color: var(--text);
-            display: flex; line-height: 1.7; overflow-x: hidden;
+        [data-theme="light"] {
+            /* Tema Light */
+            --bg-base: #f8fafc; --bg-surface: #ffffff; --bg-surface-hover: #f1f5f9;
+            --border: #e2e8f0; --primary: #4f46e5; --primary-hover: #4338ca;
+            --primary-glow: rgba(79, 70, 229, 0.1); --text-main: #0f172a;
+            --text-muted: #64748b; --success: #059669; --danger: #dc2626;
         }
 
-        /* Scrollbar Customizada */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.3s, border-color 0.3s; }
+        body { font-family: var(--font-main); background-color: var(--bg-base); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; font-size: 14px; }
 
-        /* ================= PROGRESS BAR ================= */
-        #progress-bar {
-            position: fixed; top: 0; left: 0; height: 3px;
-            background: linear-gradient(to right, var(--accent), var(--purple));
-            width: 0%; z-index: 1000; transition: width 0.1s;
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* ================= TELA DE LOADING ================= */
+        #loader-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-base); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease;
         }
+        .loader-logo { width: 80px; height: 80px; object-fit: contain; margin-bottom: 1.5rem; animation: pulse 2s infinite; }
+        .loader-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main); }
+        .loader-text { font-size: 0.9rem; color: var(--text-muted); height: 20px; margin-bottom: 2rem; }
+        .spinner { width: 30px; height: 30px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
 
         /* ================= SIDEBAR ================= */
-        .sidebar {
-            width: 300px; height: 100vh; background-color: var(--bg-alt);
-            border-right: 1px solid var(--border); position: fixed;
-            padding: 2rem 1.5rem; overflow-y: auto; z-index: 10;
-        }
-
-        .sidebar-header h2 { color: #fff; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
-        .sidebar-header span { background: var(--accent); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
-        .sidebar-header p { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; margin-top: 0.5rem; }
-
-        .nav-section { margin-bottom: 2rem; }
-        .nav-section h3 { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.8rem; padding-left: 0.5rem; }
-        .nav-links { list-style: none; }
-        .nav-links a {
-            color: var(--text); text-decoration: none; display: block;
-            padding: 0.5rem 0.8rem; border-radius: 6px; font-size: 0.9rem;
-            transition: all 0.2s; border-left: 2px solid transparent;
-        }
-        .nav-links a:hover { background: var(--bg); color: var(--accent); transform: translateX(4px); }
-        .nav-links a.active { background: var(--accent-glow); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
-
-        /* ================= CONTEÚDO PRINCIPAL ================= */
-        .content { margin-left: 300px; padding: 4rem 5rem; max-width: 1050px; width: 100%; }
-
-        .hero { margin-bottom: 5rem; animation: fadeIn 1s ease-out; }
-        .hero h1 { color: #fff; font-size: 3rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 1rem; line-height: 1.2; }
-        .hero p { color: var(--muted); font-size: 1.2rem; max-width: 700px; }
+        .sidebar { width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
         
-        .tags { display: flex; gap: 10px; margin-top: 1.5rem; }
-        .tag { background: var(--bg-alt); border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; color: var(--accent); }
-
-        /* ================= CARDS ================= */
-        .card {
-            background: var(--card); backdrop-filter: blur(10px);
-            border: 1px solid var(--border); border-radius: 16px;
-            padding: 2.5rem; margin-bottom: 4rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: transform 0.3s, border-color 0.3s;
-            opacity: 0; transform: translateY(30px); /* Para animação JS */
-        }
-        .card.visible { opacity: 1; transform: translateY(0); transition: all 0.6s ease-out; }
-        .card:hover { border-color: #484f58; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
-
-        .card h2 { color: #fff; font-size: 1.8rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px; }
-        .card h2 .number { color: var(--accent); font-family: var(--font-code); font-size: 1.2rem; background: var(--accent-glow); padding: 4px 10px; border-radius: 8px; }
+        .brand { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .brand-left { display: flex; align-items: center; gap: 10px; }
+        .brand-icon { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: transparent; }
+        .brand-icon img { width: 100%; height: 100%; object-fit: contain; }
+        .brand h1 { font-size: 1rem; font-weight: 700; }
+        .brand span { font-size: 0.6rem; background: var(--primary-glow); color: var(--primary); padding: 2px 5px; border-radius: 4px; border: 1px solid var(--primary); margin-left: 6px; }
         
-        .context { margin-bottom: 1.5rem; font-size: 1.05rem; }
-        .context strong { color: #fff; }
+        .theme-toggle { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; transition: 0.2s; padding: 4px; border-radius: 4px; }
+        .theme-toggle:hover { color: var(--primary); background: var(--bg-surface-hover); }
 
-        .example-box {
-            background: linear-gradient(90deg, rgba(188, 140, 255, 0.1) 0%, transparent 100%);
-            border-left: 4px solid var(--purple); padding: 1.2rem;
-            border-radius: 0 8px 8px 0; margin: 2rem 0;
-        }
-        .example-box h3 { color: var(--purple); font-size: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px; }
+        .user-profile { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-surface-hover); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); font-size: 0.8rem; }
+        .user-name { font-size: 0.85rem; font-weight: 600; }
+        .user-status { font-size: 0.7rem; color: var(--text-muted); }
+        .btn-login { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 0.8rem; transition: 0.2s; width: 100%; }
+        .btn-login:hover { background: var(--primary-hover); }
 
-        /* ================= CÓDIGO ================= */
-        .code-container { position: relative; margin: 1.5rem 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
-        .code-header { background: #010409; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-        .mac-dots { display: flex; gap: 6px; }
-        .mac-dots span { width: 12px; height: 12px; border-radius: 50%; }
-        .mac-dots .r { background: #ff5f56; } .mac-dots .y { background: #ffbd2e; } .mac-dots .g { background: #27c93f; }
-        .file-name { font-family: var(--font-code); font-size: 0.85rem; color: var(--muted); }
+        .progress-container { padding: 1rem 1.5rem; }
+        .progress-header { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 6px; color: var(--text-muted); }
+        .progress-bar { width: 100%; height: 6px; background: var(--bg-base); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.5s ease-out; }
 
-        pre { background: #010409; padding: 1.5rem; overflow-x: auto; font-family: var(--font-code); font-size: 0.95rem; line-height: 1.5; }
+        .nav-menu { flex: 1; overflow-y: auto; padding: 0.5rem 0; }
+        .module-title { padding: 0.5rem 1.5rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 1rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        .module-title .badge { background: var(--bg-surface-hover); padding: 2px 6px; border-radius: 10px; font-size: 0.6rem; }
+        .nav-item { padding: 0.6rem 1.5rem; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; border-left: 2px solid transparent; font-size: 0.85rem; color: var(--text-muted); }
+        .nav-item:hover:not(.locked) { background: var(--bg-surface-hover); color: var(--text-main); }
+        .nav-item.active { background: var(--primary-glow); border-left-color: var(--primary); color: var(--primary); font-weight: 500; }
+        .nav-item.completed { color: var(--text-main); }
+        .nav-item.completed .icon { color: var(--success); }
+        .nav-item.locked { opacity: 0.5; cursor: not-allowed; }
+        .nav-item .icon { width: 16px; text-align: center; font-size: 0.8rem; }
+
+        .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); }
+        .btn-donate { width: 100%; padding: 8px; background: transparent; border: 1px solid var(--border); color: var(--text-main); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; font-weight: 500; font-size: 0.8rem; }
+        .btn-donate:hover { background: var(--bg-surface-hover); border-color: var(--text-muted); }
+
+        /* ================= MAIN CONTENT ================= */
+        .main-content { flex: 1; overflow-y: auto; position: relative; background: radial-gradient(circle at 50% 0%, var(--primary-glow) 0%, transparent 50%); }
         
-        /* Cores do Código */
-        .k { color: #ff7b72; } /* Keyword */
-        .s { color: #a5d6ff; } /* String */
-        .n { color: #79c0ff; } /* Number */
-        .b { color: #ff7b72; } /* Boolean */
-        .c { color: #8b949e; font-style: italic; } /* Comment */
-        .f { color: #d2a8ff; } /* Function */
-        .o { color: #ff7b72; } /* Operator */
-        .p { color: #c9d1d9; } /* Punctuation */
+        .hero { padding: 3rem; display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; border-bottom: 1px solid var(--border); height: 100%; justify-content: center; }
+        .hero h2 { font-size: 2.2rem; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; max-width: 600px; color: var(--text-main); }
+        .hero p { color: var(--text-muted); max-width: 500px; font-size: 0.95rem; }
+        .btn-start { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; margin-top: 0.5rem; }
+        .btn-start:hover { background: var(--primary-hover); transform: translateY(-1px); }
 
-        .copy-btn {
-            background: #21262d; color: var(--text); border: 1px solid var(--border);
-            padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;
-            transition: 0.2s; display: flex; align-items: center; gap: 6px; font-family: var(--font-main);
-        }
-        .copy-btn:hover { background: #30363d; color: #fff; }
-        .copy-btn.success { background: rgba(63, 185, 80, 0.2); color: var(--green); border-color: var(--green); }
+        .content-area { padding: 2rem 3rem; max-width: 900px; margin: 0 auto; display: none; animation: fadeIn 0.3s ease-out; }
+        .content-area.active { display: block; }
 
-        /* Terminal Output */
-        .output-box {
-            background: #000; border: 1px solid var(--border); border-radius: 8px;
-            padding: 1rem; font-family: var(--font-code); font-size: 0.9rem;
-            margin-top: -0.5rem; margin-bottom: 1.5rem; color: var(--muted);
-        }
-        .output-box span.term-title { color: var(--green); display: block; margin-bottom: 5px; font-weight: bold; }
-        .output-box span.result { color: #fff; }
+        .level-guide { background: var(--bg-surface); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+        .level-guide h4 { font-size: 0.95rem; color: var(--primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 6px; }
+        .level-guide p { color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }
 
-        /* ================= RESPONSIVIDADE ================= */
-        @media (max-width: 900px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; position: relative; padding: 1.5rem; border-right: none; border-bottom: 1px solid var(--border); }
-            .content { margin-left: 0; padding: 2rem; }
-            .hero h1 { font-size: 2.2rem; }
-        }
+        .lesson-header { margin-bottom: 1.5rem; }
+        .lesson-badge { display: inline-block; background: var(--bg-surface-hover); color: var(--text-muted); padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; margin-bottom: 0.75rem; border: 1px solid var(--border); }
+        .lesson-header h1 { font-size: 1.6rem; margin-bottom: 0.75rem; color: var(--text-main); }
+        
+        .lesson-actions { display: flex; gap: 10px; margin-bottom: 1.5rem; }
+        .btn-complete { background: transparent; border: 1px solid var(--success); color: var(--success); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-complete:hover { background: var(--primary-glow); }
+        .btn-complete.done { background: var(--success); color: white; }
+        
+        .btn-download { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-download:hover { background: var(--primary-glow); }
+
+        .info-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; }
+        .info-card h3 { font-size: 0.95rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
+        .info-card p { color: var(--text-muted); line-height: 1.6; font-size: 0.9rem; }
+        .info-card.example { border-left: 3px solid var(--primary); background: linear-gradient(90deg, var(--primary-glow) 0%, var(--bg-surface) 100%); }
+
+        .code-wrapper { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem; background: #000; }
+        .code-header { background: #18181b; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #27272a; font-family: var(--font-code); font-size: 0.75rem; color: #a1a1aa; }
+        .code-wrapper pre { margin: 0 !important; padding: 1.25rem !important; background: transparent !important; font-family: var(--font-code) !important; font-size: 0.85rem !important; border-radius: 0 !important; }
+        .output-block { background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-family: var(--font-code); font-size: 0.85rem; color: #a1a1aa; margin-bottom: 2rem; }
+        .output-block .term { color: #10b981; margin-bottom: 6px; display: block; font-weight: 600; font-size: 0.8rem; }
+
+        /* Modais */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; width: 100%; max-width: 350px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5); animation: scaleIn 0.2s ease-out; position: relative; }
+        .modal h2 { text-align: center; margin-bottom: 1.5rem; font-size: 1.2rem; color: var(--text-main); }
+        .input-group { margin-bottom: 1rem; }
+        .input-group label { display: block; margin-bottom: 0.4rem; font-size: 0.8rem; color: var(--text-muted); }
+        .input-group input { width: 100%; padding: 10px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 6px; color: var(--text-main); font-family: var(--font-main); font-size: 0.85rem; outline: none; transition: 0.2s; }
+        .input-group input:focus { border-color: var(--primary); }
+        .modal-btns { display: flex; gap: 8px; margin-top: 1.5rem; }
+        .btn-primary { flex: 1; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: 0.2s; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: 0.2s; }
+        .btn-secondary:hover { background: var(--bg-surface-hover); }
+        
+        .btn-close { position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+        .btn-close:hover { color: var(--danger); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <div id="progress-bar"></div>
+    <!-- TELA DE LOADING -->
+    <div id="loader-screen">
+        <img src="jsbase.gif" alt="Logo" class="loader-logo">
+        <div class="loader-title">Fundamentos JS/TS</div>
+        <div class="loader-text" id="loading-text">Iniciando sistema...</div>
+        <div class="spinner"></div>
+    </div>
 
-    <nav class="sidebar">
-        <div class="sidebar-header">
-            <h2>🚀 Backend Journey <span>v1.0</span></h2>
-            <p>Do zero ao Backend em JS/TS</p>
-        </div>
-        
-        <div class="nav-section">
-            <h3>Fundamentos Teóricos</h3>
-            <ul class="nav-links">
-                <li><a href="#aula01">01. Variáveis e Escopo</a></li>
-                <li><a href="#aula02">02. Tipos e Operadores</a></li>
-                <li><a href="#aula03">03. Controle de Fluxo</a></li>
-                <li><a href="#aula04">04. Loops (Repetição)</a></li>
-                <li><a href="#aula05">05. Funções (Máquinas)</a></li>
-                <li><a href="#aula06">06. Arrays (Listas)</a></li>
-                <li><a href="#aula07">07. Objetos (Entidades)</a></li>
-                <li><a href="#aula08">08. Higher-Order Functions</a></li>
-                <li><a href="#aula09">09. Try/Catch (Erros)</a></li>
-                <li><a href="#aula10">10. Async/Await</a></li>
-            </ul>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-left">
+                <div class="brand-icon">
+                    <img src="jsbase.gif" alt="Logo">
+                </div>
+                <div>
+                    <h1>Fundamentos JS/TS <span>v2.1</span></h1>
+                </div>
+            </div>
+            <button class="theme-toggle" onclick="Theme.toggle()" title="Alternar Tema">🌓</button>
         </div>
 
-        <div class="nav-section">
-            <h3>Desafios Práticos</h3>
-            <ul class="nav-links">
-                <li><a href="#ex01">Ex 01. Ficha de Jogador</a></li>
-                <li><a href="#ex02">Ex 02. Cálculo de Dano</a></li>
-                <li><a href="#ex03">Ex 03. Rank de Notas</a></li>
-                <li><a href="#ex04">Ex 04. FizzBuzz Gamer</a></li>
-                <li><a href="#ex05">Ex 05. Imposto de Renda</a></li>
-                <li><a href="#ex06">Ex 06. Média de Partidas</a></li>
-                <li><a href="#ex07">Ex 07. Engine de Carro</a></li>
-                <li><a href="#ex08">Ex 08. Total de Kills</a></li>
-                <li><a href="#ex09">Ex 09. Validação de Lobby</a></li>
-                <li><a href="#ex10">Ex 10. Fetch API (Simulado)</a></li>
-            </ul>
+        <div class="user-profile" id="user-profile"></div>
+
+        <div class="progress-container" id="progress-container" style="display: none;">
+            <div class="progress-header">
+                <span>Progresso</span>
+                <span id="progress-text">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
         </div>
-    </nav>
 
-    <main class="content">
-        <section class="hero">
-            <div class="tags">
-                <span class="tag">JavaScript</span>
-                <span class="tag">TypeScript (Em breve)</span>
-                <span class="tag">Node.js</span>
-            </div>
-            <h1>Backend Foundations: A Base Sólida</h1>
-            <p>Documentando minha transição de Engenharia Química para o Desenvolvimento Backend. Foco em lógica de programação, resolução de problemas e arquitetura de sistemas.</p>
-        </section>
+        <nav class="nav-menu" id="nav-menu"></nav>
 
-        <!-- ================= AULAS ================= -->
+        <div class="sidebar-footer">
+            <button class="btn-donate" onclick="document.getElementById('donate-modal').classList.add('active')">
+                ☕ Apoie o Projeto
+            </button>
+        </div>
+    </aside>
 
-        <section id="aula01" class="card">
-            <h2><span class="number">01</span> Variáveis e Escopo</h2>
-            <div class="context">
-                <p><strong>Conceito:</strong> Variáveis são espaços alocados na memória para guardar dados temporários. Usamos <code>const</code> (imutável) e <code>let</code> (mutável). <code>var</code> caiu em desuso por problemas de escopo.</p>
-            </div>
-            <div class="example-box">
-                <h3>🌍 Assimilação Real</h3>
-                <p>Pense no inventário de um jogo. <strong>const:</strong> É a sua classe de personagem (Você escolheu Mago, não pode mudar no meio da partida). <strong>let:</strong> É a sua barra de HP (Pode subir ao tomar poção ou descer ao levar dano).</p>
-            </div>
-            <div class="code-container">
-                <div class="code-header">
-                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-                    <span class="file-name">aula01.js</span>
-                    <button class="copy-btn"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copiar</button>
-                </div>
-                <pre><code><span class="c">// A classe nunca muda</span>
-<span class="k">const</span> classe = <span class="s">"Mago"</span>;
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <div class="hero" id="hero-screen">
+            <div class="lesson-badge" style="background: var(--primary-glow); color: var(--primary); border-color: var(--primary);">Plataforma de Ensino</div>
+            <h2>Domine a base do Backend.</h2>
+            <p>Documentação interativa da minha transição de carreira. Aprenda lógica, arquitetura e resolução de problemas com exemplos práticos do mundo dos jogos.</p>
+            <button class="btn-start" id="btn-start">▶️ Iniciar Estudos</button>
+        </div>
 
-<span class="c">// O HP é dinâmico</span>
-<span class="k">let</span> hp = <span class="n">100</span>;
-hp = hp - <span class="n">30</span>; <span class="c">// Tomou dano, agora é 70</span>
-
-console.<span class="f">log</span>(<span class="s">`Classe: <span class="o">${</span>classe<span class="o">}</span> | HP Atual: <span class="o">${</span>hp<span class="o">}</span>`</span>);</code></pre>
-            </div>
-            <div class="output-box">
-                <span class="term-title">$ node aula01.js</span>
-                <span class="result">Classe: Mago | HP Atual: 70</span>
-            </div>
-        </section>
-
-        <section id="aula02" class="card">
-            <h2><span class="number">02</span> Tipos e Operadores</h2>
-            <div class="context">
-                <p><strong>Conceito:</strong> O JS não é fortemente tipado (por isso usamos TypeScript depois). Se você somar uma string com número, ele concatena (junta). Operadores matemáticos (<code>+ - * / %</code>) seguem a precedência da matemática.</p>
-            </div>
-            <div class="example-box">
-                <h3>🌍 Assimilação Real</h3>
-                <p>Se a API do jogo te manda o dano como texto <code>"50"</code> e você soma com a defesa <code>20</code>, o jogador vai levar <code>"5020"</code> de dano e bugar o servidor. Sempre converta com <code>Number()</code>.</p>
-            </div>
-            <div class="code-container">
-                <div class="code-header">
-                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-                    <span class="file-name">aula02.js</span>
-                    <button class="copy-btn">Copiar</button>
-                </div>
-                <pre><code><span class="k">const</span> danoString = <span class="s">"50"</span>; <span class="c">// Veio da API</span>
-<span class="k">const</span> defesa = <span class="n">20</span>;
-
-<span class="c">// A armadilha:</span>
-console.<span class="f">log</span>(danoString + defesa); <span class="c">// "5020" (Bug!)</span>
-
-<span class="c">// A solução: Converter e calcular</span>
-<span class="k">const</span> danoReal = <span class="f">Number</span>(danoString) - defesa;
-console.<span class="f">log</span>(danoReal); <span class="c">// 30</span></code></pre>
-            </div>
-            <div class="output-box">
-                <span class="term-title">$ node aula02.js</span>
-                <span class="result">5020<br>30</span>
-            </div>
-        </section>
-
-        <section id="aula03" class="card">
-            <h2><span class="number">03</span> Controle de Fluxo (Condicionais)</h2>
-            <div class="context">
-                <p><strong>Conceito:</strong> O cérebro do código. Usamos <code>if</code> (se), <code>else if</code> (senão, se) e <code>else</code> (senão). Combinados com operadores lógicos: <code>&&</code> (E) e <code>||</code> (OU).</p>
-            </div>
-            <div class="example-box">
-                <h3>🌍 Assimilação Real</h3>
-                <p><strong>Matchmaking:</strong> Para entrar numa partida ranqueada, o jogador precisa ter Nível >= 10 <strong>E</strong> (&&) ter o jogo original comprado. Se ele não cumprir, cai no <code>else</code> e recebe um bloqueio.</p>
-            </div>
-            <div class="code-container">
-                <div class="code-header">
-                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-                    <span class="file-name">aula03.js</span>
-                    <button class="copy-btn">Copiar</button>
-                </div>
-                <pre><code><span class="k">const</span> nivel = <span class="n">15</span>;
-<span class="k">const</span> temJogoOriginal = <span class="b">true</span>;
-
-<span class="k">if</span> (nivel >= <span class="n">10</span> <span class="o">&&</span> temJogoOriginal) {
-    console.<span class="f">log</span>(<span class="s">"✅ Entrando na fila Ranqueada..."</span>);
-} <span class="k">else</span> {
-    console.<span class="f">log</span>(<span class="s">"❌ Acesso negado. Jogue Casual primeiro."</span>);
-}</code></pre>
-            </div>
-            <div class="output-box">
-                <span class="term-title">$ node aula03.js</span>
-                <span class="result">✅ Entrando na fila Ranqueada...</span>
-            </div>
-        </section>
-
-        <section id="aula04" class="card">
-            <h2><span class="number">04</span> Loops (A Repetição)</h2>
-            <div class="context">
-                <p><strong>Conceito:</strong> Automação. O <code>for</code> itera um número conhecido de vezes. O <code>while</code> roda até a condição falhar. O <code>for...of</code> é usado para percorrer listas.</p>
-            </div>
-            <div class="example-box">
-                <h3>🌍 Assimilação Real</h3>
-                <p>Imagine que você precisa spawnar 5 inimigos em um mapa de tower defense. Em vez de escrever `spawnarInimigo()` 5 vezes, você usa um loop <code>for</code> que chama a função 5 vezes de forma automática.</p>
-            </div>
-            <div class="code-container">
-                <div class="code-header">
-                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-                    <span class="file-name">aula04.js</span>
-                    <button class="copy-btn">Copiar</button>
-                </div>
-                <pre><code><span class="c">// Loop para contar inimigos restantes</span>
-<span class="k">for</span> (<span class="k">let</span> i = <span class="n">1</span>; i <= <span class="n">3</span>; i++) {
-    console.<span class="f">log</span>(<span class="s">`Inimigo <span class="o">${</span>i<span class="o">}</span> spawnado na arena!`</span>);
-}</code></pre>
-            </div>
-            <div class="output-box">
-                <span class="term-title">$ node aula04.js</span>
-                <span class="result">Inimigo 1 spawnado na arena!<br>Inimigo 2 spawnado na arena!<br>Inimigo 3 spawnado na arena!</span>
-            </div>
-        </section>
-
-        <section id="aula05" class="card">
-            <h2><span class="number">05</span> Funções (As Máquinas)</h2>
-            <div class="context">
-                <p><strong>Conceito:</strong> Funções são blocos de código que só rodam quando chamados. Elas podem receber parâmetros e devolver um valor com <code>return</code>. Arrow functions (<code>=></code>) são a forma moderna.</p>
-            </div>
-            <div class="example-box">
-                <h3>🌍 Assimilação Real</h3>
-                <p>Uma função é como a fórmula de dano do LOL ou CS. Você passa os atributos (Ataque, Defesa do alvo) e a função processa, aplicando a matemática, e te devolve o dano final. Se você mudar a fórmula, muda em um lugar só.</p>
-            </div>
-            <div class="code-container">
-                <div class="code-header">
-                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-                    <span class="file-name">aula05.js</span>
-                    <button class="copy-btn">Copiar</button>
-                </div>
-                <pre><code><span class="c">// Arrow function para calcular dano crítico</span>
-<span class="k">const</span> calcularDano = (ataque, multiplicador) <span class="k">=></span> {
-    <span class="k">return</span> ataque * multiplicador;
-};
-
-<span class="k">const</span> danoCritico = <span class="f">calcularDano</span>(<span class="n">100</span>, <span class="n">2.5</span>); <span class="c">// 100 base, 2.5x crítico</span>
-console.<span class="f">log</span>(<span class="s">`💥 Dano Crítico: <span class="o">${</span>danoCritico<span class="o">}</span>`</span>);</code></pre>
-            </div>
-            <div class="output-box">
-                <span class="term-title">$ node aula05.js</span>
-                <span class="result">💥 Dano Crítico: 250</span>
-            </div>
-        </section>
-
-        <section id="aula06" class="card">
-            <h2><span class="number">06</span> Arrays (Listas de Dados)</h2>
-            <div class="context">
-                <p><strong>Conceito:</strong> Estruturas indexadas (começam no 0) que guardam múltiplos valores. Métodos essenciais: <code>.push()</code> (adicionar), <code>.pop()</code> (remover final), <code>.length</code> (tamanho).</p>
-            </div>
-            <div class="example-box">
-                <h3>🌍 Assimilação Real</h3>
-                <p>O array é o inventário do jogador. O item no index 0 é a primeira arma. Quando você pega um novo loot, você dá um <code>.push()</code>. Se o inventário enche (atinge o <code>.length</code> máximo), você precisa dropar algo.</p>
-            </div>
-            <div class="code-container">
-                <div class="code-header">
-                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-                    <span class="file-name">aula06.js</span>
-                    <button class="copy-btn">Copiar</button>
-                </div>
-                <pre><code><span class="k">const</span> inventario = [<span class="s">"Faca"</span>, <span class="s">"Pistola"</span>];
-inventario.<span class="f">push</span>(<span class="s">"Rifle"</span>); <span class="c">// Adiciona no final</span>
-
-console.<span class="f">log</span>(<span class="s">`Itens: <span class="o">${</span>inventario<span class="o">}</span>`</span>);
-console.<span class="f">log</span>(<span class="s">`Primeiro item: <span class="o">${</span>inventario[<span class="n">0</span>]<span class="o">}</span>`</span>);</code></pre>
-            </div>
-            <div class="output-box">
-                <span class="term-title">$ node aula06.js</span>
-                <span class="result">Itens: Faca,Pistola,Rifle<br>Primeiro item: Faca</span>
-            </div>
-        </section>
-
-        <section id="aula07" class="card">
-            <h2><span class="number">07</span> Objetos (Entidades)</h2>
-            <div class="context">
-                <p><strong>Conceito:</strong> Agrupam propriedades (chave-valor). São a representação de entidades do mundo real no código (um Jogador, uma Arma, uma Partida). Acessados via <code>obj.chave</code>.</p>
-            </div>
-            <div class="example-box">
-                <h3>🌍 Assimilação Real</h3>
-                <p>Uma API de jogo não te devolve o jogador como um array solto. Ela te devolve um Objeto: <code>{ id: 1, nome: "Faker", elo: "Desafiante" }</code>. O objeto tem nome para cada informação.</p>
-            </div>
-            <div class="code-container">
-                <div class="code-header">
-                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-                    <span class="file-name">aula07.js</span>
-                    <button class="copy-btn">Copiar</button>
-                </div>
-                <pre><code><span class="k">const</span> jogador = {
-    nick: <span class="s">"Faker"</span>,
-    funcao: <span class="s">"Mid"</span>,
-    campeao: <span class="s">"Azir"</span>
-};
-
-console.<span class="f">log</span>(<span class="s">`O jogador <span class="o">${</span>jogador.nick<span class="o">}</span> joga de <span class="o">${</span>jogador.funcao<span class="o">}</span> com o <span class="o">${</span>jogador.campeao<span class="o">}</span>.`</span>);</code></pre>
-            </div>
-            <div class="output-box">
-                <span class="term-title">$ node aula07.js</span>
-                <span class="result">O jogador Faker joga de Mid com o Azir.</span>
-            </div>
-        </section>
-
-        <section id="aula08" class="card">
-            <h2><span class="number">08</span> Higher-Order Functions</h2>
-            <div class="context">
-                <p><strong>Conceito:</strong> O segredo do backend moderno. <code>.map()</code> transforma um array em outro. <code>.filter()</code> cria um novo array apenas com os itens que passam num teste. <code>.reduce()</code> transforma o array em um único valor.</p>
-            </div>
-            <div class="example-box">
-                <h3>🌍 Assimilação Real</h3>
-                <p>Se você tem a lista de todos os jogadores da partida, o <code>.filter()</code> é o que a Riot usa para pegar apenas os jogadores que deram "Report" por cheat. O <code>.map()</code> é usado para pegar apenas os nomes (strings) desses jogadores.</p>
-            </div>
-            <div class="code-container">
-                <div class="code-header">
-                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-                    <span class="file-name">aula08.js</span>
-                    <button class="copy-btn">Copiar</button>
-                </div>
-                <pre><code><span class="k">const</span> jogadores = [
-    { nome: <span class="s">"Ana"</span>, kda: <span class="n">1.2</span> },
-    { nome: <span class="s">"Hacker"</span>, kda: <span class="n">15.0</span> } <span class="c">// Suspeito!</span>
-];
-
-<span class="c">// Filtra jogadores com KDA maior que 10</span>
-<span class="k">const</span> suspeitos = jogadores.<span class="f">filter</span>(j <span class="k">=></span> j.kda > <span class="n">10</span>);
-
-<span class="c">// Pega apenas os nomes dos suspeitos</span>
-<span class="k">const</span> nomesSuspeitos = suspeitos.<span class="f">map</span>(j <span class="k">=></span> j.nome);
-
-console.<span class="f">log</span>(nomesSuspeitos);</code></pre>
-            </div>
-            <div class="output-box">
-                <span class="term-title">$ node aula08.js</span>
-                <span class="result">[ 'Hacker' ]</span>
-            </div>
-        </section>
-
-        <section id="aula09" class="card">
-            <h2><span class="number">09</span> Try/Catch (Gestão de Erros)</h2>
-            <div class="context">
-                <p><strong>Conceito:</strong> Se um erro ocorrer, o programa inteiro não pode cair. O <code>try</code> tenta rodar o código. Se der erro, o <code>catch</code> intercepta e evita o crash. Usamos <code>throw new Error()</code> para forçar um erro.</p>
-            </div>
-            <div class="example-box">
-                <h3>🌍 Assimilação Real</h3>
-                <p>Você está lendo um arquivo JSON de save do jogo. Se o arquivo estiver corrompido, sem o try/catch o servidor cai (DDoS acidental). Com o try/catch, ele lê, vê que deu erro, e retorna uma mensagem amigável pro jogador.</p>
-            </div>
-            <div class="code-container">
-                <div class="code-header">
-                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-                    <span class="file-name">aula09.js</span>
-                    <button class="copy-btn">Copiar</button>
-                </div>
-                <pre><code><span class="k">function</span> <span class="f">comprarItem</span>(preco, saldo) {
-    <span class="k">if</span> (preco > saldo) {
-        <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">"Saldo insuficiente para compra!"</span>);
-    }
-    <span class="k">return</span> <span class="s">"Compra realizada"</span>;
-}
-
-<span class="k">try</span> {
-    <span class="f">comprarItem</span>(<span class="n">500</span>, <span class="n">200</span>);
-} <span class="k">catch</span> (erro) {
-    console.<span class="f">log</span>(<span class="s">`❌ Falha: <span class="o">${</span>erro.message<span class="o">}</span>`</span>);
-}</code></pre>
-            </div>
-            <div class="output-box">
-                <span class="term-title">$ node aula09.js</span>
-                <span class="result">❌ Falha: Saldo insuficiente para compra!</span>
-            </div>
-        </section>
-
-        <section id="aula10" class="card">
-            <h2><span class="number">10</span> Async / Await (Promises)</h2>
-            <div class="context">
-                <p><strong>Conceito:</strong> O JavaScript não espera requisições terminarem (single-thread). Se você buscar dados do banco, o código continua rodando. O <code>await</code> pausa a função <code>async</code> até a Promise retornar sucesso ou falha.</p>
-            </div>
-            <div class="example-box">
-                <h3>🌍 Assimilação Real</h3>
-                <p>Quando você clica em "Entrar na Partida", o servidor da Riot precisa verificar seu login, seu elo, e te alocar numa sala. Isso demora 1-2 segundos. O navegador não pode congelar. Ele segura a requisição com <code>await</code>, e o resto do site continua clicável.</p>
-            </div>
-            <div class="code-container">
-                <div class="code-header">
-                    <div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-                    <span class="file-name">aula10.js</span>
-                    <button class="copy-btn">Copiar</button>
-                </div>
-                <pre><code><span class="c">// Simula uma API lenta</span>
-<span class="k">function</span> <span class="f">buscarRanking</span>() {
-    <span class="k">return new</span> <span class="f">Promise</span>(resolve <span class="k">=></span> {
-        <span class="f">setTimeout</span>(() <span class="k">=></span> <span class="f">resolve</span>({ elo: <span class="s">"Desafiante"</span>, pontos: <span class="n">1200</span> }), <span class="n">1500</span>);
-    });
-}
-
-<span class="k">async function</span> <span class="f">carregarPerfil</span>() {
-    console.<span class="f">log</span>(<span class="s">"Buscando dados na API..."</span>);
-    <span class="k">const</span> dados = <span class="k">await</span> <span class="f">buscarRanking</span>(); <span class="c">// Pausa aqui e espera 1.5s</span>
-    console.<span class="f">log</span>(<span class="s">`Elo: <span class="o">${</span>dados.elo<span class="o">}</span> | LP: <span class="o">${</span>dados.pontos<span class="o">}</span>`</span>);
-}
-
-<span class="f">carregarPerfil</span>();</code></pre>
-            </div>
-            <div class="output-box">
-                <span class="term-title">$ node aula10.js</span>
-                <span class="result">Buscando dados na API...<br><i>(espera 1.5s)</i><br>Elo: Desafiante | LP: 1200</span>
-            </div>
-        </section>
-
-        <!-- ================= EXERCÍCIOS ================= -->
-
-        <section id="ex01" class="card">
-            <h2><span class="number">EX 01</span> Ficha de Jogador</h2>
-            <div class="context"><p>Crie variáveis com nome, idade e jogo favorito e imprima uma string interpolada.</p></div>
-            <div class="code-container">
-                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex01.js</span><button class="copy-btn">Copiar</button></div>
-                <pre><code><span class="k">const</span> nick = <span class="s">"Tauã"</span>;
-<span class="k">const</span> rank = <span class="s">"Global Elite"</span>;
-console.<span class="f">log</span>(<span class="s">`O jogador <span class="o">${</span>nick<span class="o">}</span> está no rank <span class="o">${</span>rank<span class="o">}</span>.`</span>);</code></pre>
-            </div>
-            <div class="output-box"><span class="term-title">$ node ex01.js</span><span class="result">O jogador Tauã está no rank Global Elite.</span></div>
-        </section>
-
-        <section id="ex02" class="card">
-            <h2><span class="number">EX 02</span> Cálculo de Dano</h2>
-            <div class="context"><p>Calcule dano (ataque - defesa). Se for negativo, retorne "Bloqueado".</p></div>
-            <div class="code-container">
-                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex02.js</span><button class="copy-btn">Copiar</button></div>
-                <pre><code><span class="k">const</span> ataque = <span class="n">50</span>; <span class="k">const</span> defesa = <span class="n">80</span>;
-<span class="k">const</span> dano = ataque - defesa;
-
-<span class="k">if</span> (dano <span class="o"><=</span> <span class="n">0</span>) {
-    console.<span class="f">log</span>(<span class="s">"Dano Bloqueado"</span>);
-} <span class="k">else</span> {
-    console.<span class="f">log</span>(<span class="s">`Dano de <span class="o">${</span>dano<span class="o">}</span>`</span>);
-}</code></pre>
-            </div>
-            <div class="output-box"><span class="term-title">$ node ex02.js</span><span class="result">Dano Bloqueado</span></div>
-        </section>
-
-        <section id="ex03" class="card">
-            <h2><span class="number">EX 03</span> Rank de Notas</h2>
-            <div class="context"><p>Notas >= 9 (MVP), >= 7 (Bom), resto (Treinar).</p></div>
-            <div class="code-container">
-                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex03.js</span><button class="copy-btn">Copiar</button></div>
-                <pre><code><span class="k">const</span> nota = <span class="n">8.5</span>;
-<span class="k">if</span> (nota >= <span class="n">9</span>) console.<span class="f">log</span>(<span class="s">"MVP"</span>);
-<span class="k">else if</span> (nota >= <span class="n">7</span>) console.<span class="f">log</span>(<span class="s">"Bom Jogador"</span>);
-<span class="k">else</span> console.<span class="f">log</span>(<span class="s">"Precisa treinar"</span>);</code></pre>
-            </div>
-            <div class="output-box"><span class="term-title">$ node ex03.js</span><span class="result">Bom Jogador</span></div>
-        </section>
-
-        <section id="ex04" class="card">
-            <h2><span class="number">EX 04</span> FizzBuzz Gamer</h2>
-            <div class="context"><p>Loop de 1 a 50. Múltiplos de 5 imprimem "Fizz".</p></div>
-            <div class="code-container">
-                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex04.js</span><button class="copy-btn">Copiar</button></div>
-                <pre><code><span class="k">for</span> (<span class="k">let</span> i = <span class="n">1</span>; i <= <span class="n">50</span>; i++) {
-    <span class="k">if</span> (i % <span class="n">5</span> === <span class="n">0</span>) console.<span class="f">log</span>(<span class="s">"Fizz"</span>);
-    <span class="k">else</span> console.<span class="f">log</span>(i);
-}</code></pre>
-            </div>
-            <div class="output-box"><span class="term-title">$ node ex04.js</span><span class="result">1, 2, 3, 4, Fizz, 6, 7, 8, 9, Fizz...</span></div>
-        </section>
-
-        <section id="ex05" class="card">
-            <h2><span class="number">EX 05</span> Imposto de Renda</h2>
-            <div class="context"><p>Função que calcula 15% se salário > 3000.</p></div>
-            <div class="code-container">
-                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex05.js</span><button class="copy-btn">Copiar</button></div>
-                <pre><code><span class="k">const</span> calcularIR = (salario) <span class="k">=></span> salario > <span class="n">3000</span> ? salario * <span class="n">0.15</span> : <span class="n">0</span>;
-console.<span class="f">log</span>(<span class="f">calcularIR</span>(<span class="n">5000</span>));</code></pre>
-            </div>
-            <div class="output-box"><span class="term-title">$ node ex05.js</span><span class="result">750</span></div>
-        </section>
-
-        <section id="ex06" class="card">
-            <h2><span class="number">EX 06</span> Média de Partidas</h2>
-            <div class="context"><p>Array de notas, loop e cálculo de média.</p></div>
-            <div class="code-container">
-                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex06.js</span><button class="copy-btn">Copiar</button></div>
-                <pre><code><span class="k">const</span> notas = [<span class="n">10</span>, <span class="n">5</span>, <span class="n">8</span>, <span class="n">2</span>, <span class="n">9</span>];
-<span class="k">let</span> soma = <span class="n">0</span>;
-<span class="k">for</span> (<span class="k">let</span> n <span class="k">of</span> notas) soma += n;
-console.<span class="f">log</span>(<span class="s">`Média: <span class="o">${</span>soma / notas.length<span class="o">}</span>`</span>);</code></pre>
-            </div>
-            <div class="output-box"><span class="term-title">$ node ex06.js</span><span class="result">Média: 6.8</span></div>
-        </section>
-
-        <section id="ex07" class="card">
-            <h2><span class="number">EX 07</span> Engine de Carro</h2>
-            <div class="context"><p>Objeto carro, alterar boolean `ligado` e imprimir.</p></div>
-            <div class="code-container">
-                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex07.js</span><button class="copy-btn">Copiar</button></div>
-                <pre><code><span class="k">const</span> carro = { marca: <span class="s">"Ford"</span>, ligado: <span class="b">false</span> };
-carro.ligado = <span class="b">true</span>;
-console.<span class="f">log</span>(<span class="s">"Carro ligado"</span>);</code></pre>
-            </div>
-            <div class="output-box"><span class="term-title">$ node ex07.js</span><span class="result">Carro ligado</span></div>
-        </section>
-
-        <section id="ex08" class="card">
-            <h2><span class="number">EX 08</span> Total de Kills (Reduce)</h2>
-            <div class="context"><p>Usar `.reduce()` para acumular total de kills.</p></div>
-            <div class="code-container">
-                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex08.js</span><button class="copy-btn">Copiar</button></div>
-                <pre><code><span class="k">const</span> team = [{k: <span class="n">10</span>}, {k: <span class="n">20</span>}, {k: <span class="n">15</span>}];
-<span class="k">const</span> total = team.<span class="f">reduce</span>((acc, p) <span class="k">=></span> acc + p.k, <span class="n">0</span>);
-console.<span class="f">log</span>(total);</code></pre>
-            </div>
-            <div class="output-box"><span class="term-title">$ node ex08.js</span><span class="result">45</span></div>
-        </section>
-
-        <section id="ex09" class="card">
-            <h2><span class="number">EX 09</span> Validação de Lobby</h2>
-            <div class="context"><p>Lançar erro se `hp` não existir, capturar com try/catch.</p></div>
-            <div class="code-container">
-                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex09.js</span><button class="copy-btn">Copiar</button></div>
-                <pre><code><span class="k">try</span> {
-    <span class="k">const</span> player = { nome: <span class="s">"Noob"</span> }; <span class="c">// Sem HP</span>
-    <span class="k">if</span> (!player.hp) <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">"Jogador inválido"</span>);
-} <span class="k">catch</span> (e) {
-    console.<span class="f">log</span>(e.message);
-}</code></pre>
-            </div>
-            <div class="output-box"><span class="term-title">$ node ex09.js</span><span class="result">Jogador inválido</span></div>
-        </section>
-
-        <section id="ex10" class="card">
-            <h2><span class="number">EX 10</span> Fetch API (Simulado)</h2>
-            <div class="context"><p>Async/await com setTimeout e Promise.</p></div>
-            <div class="code-container">
-                <div class="code-header"><div class="mac-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file-name">ex10.js</span><button class="copy-btn">Copiar</button></div>
-                <pre><code><span class="k">const</span> getUser = () <span class="k">=></span> <span class="k">new</span> <span class="f">Promise</span>(r <span class="k">=></span> <span class="f">setTimeout</span>(() <span class="k">=></span> <span class="f">r</span>({ nick: <span class="s">"Faker"</span> }), <span class="n">1000</span>));
-
-<span class="k">async function</span> <span class="f">main</span>() {
-    <span class="k">const</span> user = <span class="k">await</span> <span class="f">getUser</span>();
-    console.<span class="f">log</span>(user.nick);
-}
-<span class="f">main</span>();</code></pre>
-            </div>
-            <div class="output-box"><span class="term-title">$ node ex10.js</span><span class="result">Faker <i>(após 1s)</i></span></div>
-        </section>
-
-        <footer style="text-align: center; color: var(--muted); padding: 2rem 0; border-top: 1px solid var(--border); margin-top: 4rem;">
-            <p>Desenvolvido por Tauã Miguel | Transição de Carreira | 2026</p>
-        </footer>
+        <div class="content-area" id="lesson-screen"></div>
     </main>
 
+    <!-- MODAL LOGIN -->
+    <div class="modal-overlay" id="login-modal">
+        <div class="modal">
+            <h2>Acessar Plataforma</h2>
+            <div class="input-group">
+                <label>Usuário</label>
+                <input type="text" id="login-user" placeholder="Ex: taua_dev">
+            </div>
+            <div class="input-group">
+                <label>Senha</label>
+                <input type="password" id="login-pass" placeholder="••••••••">
+            </div>
+            <div class="modal-btns">
+                <button class="btn-primary" onclick="Auth.login()">Entrar</button>
+                <button class="btn-secondary" onclick="Auth.register()">Criar Conta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE DOAÇÃO -->
+    <div class="modal-overlay" id="donate-modal">
+        <div class="modal" style="max-width: 400px;">
+            <!-- Botão de Fechar X -->
+            <button class="btn-close" onclick="document.getElementById('donate-modal').classList.remove('active')">✕</button>
+            
+            <h2>Apoie o Projeto ☕</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; margin-bottom: 1.5rem; line-height: 1.5;">
+                Se este material te ajudou a aprender algo novo, considere me pagar um café! Sua contribuição me incentiva a continuar criando conteúdo de qualidade e mantendo o projeto gratuito.
+            </p>
+
+            <!-- Foto do QR Code -->
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <img src="qrcode.jpeg" alt="QR Code PIX" style="width: 150px; height: 150px; border-radius: 12px; border: 1px solid var(--border); object-fit: cover; padding: 4px; background: #fff;">
+            </div>
+
+            <!-- Chave 1: Aleatória -->
+            <div class="input-group" style="margin-bottom: 1rem;">
+                <label style="display: flex; justify-content: space-between;">
+                    Chave Aleatória
+                </label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="pix-key-1" value="de9009bc-6ace-4f5c-944d-370e1e28eff0" readonly style="font-size: 0.75rem; cursor: text; padding: 8px;">
+                    <button class="btn-primary" style="flex: none; width: 80px; padding: 0; font-size: 0.8rem; background: var(--border); color: var(--text-main);" onclick="UI.copyPix('pix-key-1', this)">Copiar</button>
+                </div>
+            </div>
+
+            <!-- Chave 2: Fixa (Email) -->
+            <div class="input-group" style="margin-bottom: 1.5rem;">
+                <label style="display: flex; justify-content: space-between;">
+                    Chave Fixa (Email)
+                </label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="pix-key-2" value="tauamiguel77@gmail.com" readonly style="font-size: 0.85rem; cursor: text; padding: 8px;">
+                    <button class="btn-primary" style="flex: none; width: 80px; padding: 0; font-size: 0.8rem; background: var(--border); color: var(--text-main);" onclick="UI.copyPix('pix-key-2', this)">Copiar</button>
+                </div>
+            </div>
+
+            <button class="btn-secondary" style="width: 100%;" onclick="document.getElementById('donate-modal').classList.remove('active')">
+                Voltar para os estudos
+            </button>
+        </div>
+    </div>
+
     <script>
-        // ================= 1. BARRA DE PROGRESSO =================
-        window.onscroll = function() {
-            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            let scrolled = (winScroll / height) * 100;
-            document.getElementById("progress-bar").style.width = scrolled + "%";
+        // =====================================================================
+        // 🌓 GERENCIADOR DE TEMAS
+        // =====================================================================
+        const Theme = {
+            init: () => {
+                const saved = localStorage.getItem('@DevJourney:theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', saved);
+            },
+            toggle: () => {
+                const current = document.documentElement.getAttribute('data-theme');
+                const target = current === 'light' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', target);
+                localStorage.setItem('@DevJourney:theme', target);
+                Prism.highlightAll(); 
+            }
         };
 
-        // ================= 2. ANIMAÇÃO FADE-IN (SCROLL REVEAL) =================
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.card').forEach(card => {
-            observer.observe(card);
-        });
-
-        // ================= 3. SCROLLSPY (MENU ATIVO) =================
-        const sections = document.querySelectorAll('section');
-        const navLi = document.querySelectorAll('.nav-links a');
-
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (pageYOffset >= sectionTop - 150) {
-                    current = section.getAttribute('id');
-                }
-            });
-
-            navLi.forEach(a => {
-                a.classList.remove('active');
-                if (a.getAttribute('href') === '#' + current) {
-                    a.classList.add('active');
-                }
-            });
-        });
-
-        // ================= 4. BOTÃO COPIAR CÓDIGO =================
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const codeBlock = this.closest('.code-container').querySelector('code');
-                const textToCopy = codeBlock.innerText;
+        // =====================================================================
+        // ⏳ TELA DE LOADING
+        // =====================================================================
+        const Loader = {
+            messages: [
+                "Iniciando sistema...",
+                "Carregando módulos de JavaScript...",
+                "Conectando ao banco de dados...",
+                "Preparando ambiente de estudos...",
+                "Quase pronto!"
+            ],
+            init: () => {
+                let index = 0;
+                const textEl = document.getElementById('loading-text');
                 
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    const originalText = this.innerHTML;
-                    this.innerHTML = '✓ Copiado';
-                    this.classList.add('success');
+                const interval = setInterval(() => {
+                    textEl.innerText = Loader.messages[index];
+                    index++;
+                    if(index >= Loader.messages.length) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            const screen = document.getElementById('loader-screen');
+                            screen.style.opacity = '0';
+                            setTimeout(() => {
+                                screen.style.display = 'none';
+                                UI.init(); 
+                            }, 500); 
+                        }, 800);
+                    }
+                }, 800); 
+            }
+        };
+
+        // =====================================================================
+        // 📚 BANCO DE DADOS (CURRÍCULO)
+        // =====================================================================
+        const Curriculum = [
+            {
+                id: "mod1",
+                title: "Módulo 1: Fundamentos",
+                level: "Básico",
+                status: "aberto",
+                moduleDesc: "Aqui é onde tudo começa. Neste módulo, você vai aprender como o computador pensa. Não se preocupe com arquiteturas complexas ainda. O objetivo é fazer você entender como guardar dados na memória, tomar decisões simples e repetir tarefas.",
+                lessons: [
+                    { id: "aula01", title: "01. Variáveis e Escopo", concept: "Variáveis são espaços alocados na memória. Usamos <code>const</code> para valores fixos e <code>let</code> para valores mutáveis. O <code>var</code> caiu em desuso por problemas de escopo.", example: "Pense no inventário. <code>const</code> é sua classe (Mago). <code>let</code> é seu HP (pode mudar).", code: `const classe = "Mago";\nlet hp = 100;\nhp = hp - 30;\nconsole.log(\`Classe: \${classe} | HP: \${hp}\`);`, output: "Classe: Mago | HP: 70" },
+                    { id: "aula02", title: "02. Tipos e Operadores", concept: "O JS não é fortemente tipado. Somar string com número concatena. Sempre converta com <code>Number()</code> antes de calcular.", example: "Se a API manda o dano como texto '50' e você soma com a defesa 20, o jogador leva '5020' de dano (Bug).", code: `const danoString = "50";\nconst defesa = 20;\nconsole.log(danoString + defesa); // "5020"\nconst danoReal = Number(danoString) - defesa;\nconsole.log(danoReal); // 30`, output: "5020\n30" },
+                    { id: "aula03", title: "03. Controle de Fluxo", concept: "O cérebro do código. <code>if</code>, <code>else if</code>, <code>else</code> combinados com <code>&&</code> (E) e <code>||</code> (OU).", example: "Para entrar na ranqueada, precisa ter Nível >= 10 <strong>E</strong> ter o jogo original.", code: `const nivel = 15;\nconst temJogo = true;\nif (nivel >= 10 && temJogo) {\n  console.log("✅ Entrando na fila...");\n}`, output: "✅ Entrando na fila..." },
+                    { id: "aula04", title: "04. Loops", concept: "Automação. O <code>for</code> itera um número conhecido de vezes. O <code>while</code> roda até a condição falhar.", example: "Spawnar 3 inimigos no mapa usando um loop for em vez de copiar e colar o código 3 vezes.", code: `for (let i = 1; i <= 3; i++) {\n  console.log(\`Inimigo \${i} spawnado!\`);\n}`, output: "Inimigo 1 spawnado!\nInimigo 2 spawnado!\nInimigo 3 spawnado!" },
+                    { id: "aula05", title: "05. Funções", concept: "Blocos de código que só rodam quando chamados. Recebem parâmetros e devolvem <code>return</code>.", example: "Máquina de café. Ingredientes entram, café sai. Evita reescrever a fórmula de dano toda hora.", code: `const calcularDano = (atk, mult) => {\n  return atk * mult;\n};\nconsole.log(calcularDano(100, 2.5));`, output: "250" },
+                    { id: "aula06", title: "06. Arrays", concept: "Estruturas indexadas que guardam múltiplos valores. Métodos: <code>.push()</code>, <code>.length</code>.", example: "O inventário do jogador. Ao pegar um novo loot, usa-se <code>.push()</code>.", code: `const inventario = ["Faca", "Pistola"];\ninventario.push("Rifle");\nconsole.log(\`Itens: \${inventario}\`);`, output: "Itens: Faca,Pistola,Rifle" },
+                    { id: "aula07", title: "07. Objetos", concept: "Agrupam propriedades (chave-valor). Representação de entidades do mundo real.", example: "Uma API devolve o jogador como Objeto: <code>{ nome: \"Faker\", elo: \"Desafiante\" }</code>.", code: `const jogador = {\n  nick: "Faker",\n  funcao: "Mid"\n};\nconsole.log(\`O jogador \${jogador.nick} joga de \${jogador.funcao}.\`);`, output: "O jogador Faker joga de Mid." },
+                    { id: "aula08", title: "08. Higher-Order Functions", concept: "<code>.map()</code> transforma, <code>.filter()</code> filtra, <code>.reduce()</code> acumula. O segredo do backend.", example: "A Riot usa <code>.filter()</code> para pegar jogadores com KDA > 10 (suspeitos de cheat).", code: `const jogadores = [\n  { nome: "Ana", kda: 1.2 },\n  { nome: "Hacker", kda: 15.0 }\n];\nconst suspeitos = jogadores.filter(j => j.kda > 10);\nconsole.log(suspeitos);`, output: "[ { nome: 'Hacker', kda: 15 } ]" },
+                    { id: "aula09", title: "09. Try/Catch", concept: "Se um erro ocorrer, o programa inteiro não pode cair. O <code>catch</code> intercepta e evita o crash.", example: "Lendo um JSON de save corrompido. Com try/catch, retorna erro amigável em vez de derrubar o servidor.", code: `try {\n  throw new Error("Falha no save");\n} catch (erro) {\n  console.log(\`❌ \${erro.message}\`);\n}`, output: "❌ Falha no save" },
+                    { id: "aula10", title: "10. Async / Await", concept: "O JS não espera requisições terminarem. O <code>await</code> pausa a função <code>async</code> até a Promise retornar.", example: "Ao clicar em 'Entrar na Partida', o servidor demora 1-2s. O site não congela, usa <code>await</code>.", code: `async function carregarPerfil() {\n  const dados = await buscarRanking();\n  console.log(dados.elo);\n}`, output: "Desafiante" }
+                ]
+            },
+            {
+                id: "mod2",
+                title: "Módulo 2: Prática",
+                level: "Iniciante",
+                status: "aberto",
+                moduleDesc: "A teoria sem prática é inútil. Neste módulo, você vai aplicar tudo o que aprendeu no Módulo 1 em desafios reais. O objetivo não é apenas fazer o código rodar, mas sim fazer do jeito mais limpo possível.",
+                lessons: [
+                    { id: "ex01", title: "Ex 01. Ficha de Jogador", concept: "Crie variáveis com nome, idade e jogo favorito e imprima usando template strings.", example: "Juntar informações de texto numa frase só usando a crase (``).", code: `const nick = "Tauã";\nconst rank = "Global Elite";\nconsole.log(\`O jogador \${nick} está no rank \${rank}.\`);`, output: "O jogador Tauã está no rank Global Elite." },
+                    { id: "ex02", title: "Ex 02. Cálculo de Dano", concept: "Calcule dano (ataque - defesa). Se for negativo, retorne 'Bloqueado'.", example: "Lógica simples de mitigação de dano em RPGs.", code: `const ataque = 50; const defesa = 80;\nconst dano = ataque - defesa;\nif (dano <= 0) {\n  console.log("Dano Bloqueado");\n} else {\n  console.log(\`Dano de \${dano}\`);\n}`, output: "Dano Bloqueado" },
+                    { id: "ex03", title: "Ex 03. Rank de Notas", concept: "Notas >= 9 (MVP), >= 7 (Bom), resto (Treinar).", example: "Sistema de rankeamento baseado em performance.", code: `const nota = 8.5;\nif (nota >= 9) console.log("MVP");\nelse if (nota >= 7) console.log("Bom Jogador");\nelse console.log("Precisa treinar");`, output: "Bom Jogador" },
+                    { id: "ex04", title: "Ex 04. FizzBuzz Gamer", concept: "Loop de 1 a 50. Múltiplos de 5 imprimem 'Fizz'.", example: "Teste clássico de lógica e uso do operador de resto (%).", code: `for (let i = 1; i <= 50; i++) {\n  if (i % 5 === 0) console.log("Fizz");\n  else console.log(i);\n}`, output: "1, 2, 3, 4, Fizz, 6, 7, 8, 9, Fizz..." },
+                    { id: "ex05", title: "Ex 05. Imposto de Renda", concept: "Função que calcula 15% se salário > 3000, senão 0.", example: "Uso de arrow function com operador ternário.", code: `const calcularIR = (salario) => salario > 3000 ? salario * 0.15 : 0;\nconsole.log(calcularIR(5000));`, output: "750" },
+                    { id: "ex06", title: "Ex 06. Média de Partidas", concept: "Array de notas, loop para somar e cálculo de média.", example: "Análise de performance em múltiplas partidas.", code: `const notas = [10, 5, 8, 2, 9];\nlet soma = 0;\nfor (let n of notas) soma += n;\nconsole.log(\`Média: \${soma / notas.length}\`);`, output: "Média: 6.8" },
+                    { id: "ex07", title: "Ex 07. Engine de Carro", concept: "Objeto carro, alterar boolean 'ligado' e imprimir.", example: "Mutação de estado de um objeto (entidade).", code: `const carro = { marca: "Ford", ligado: false };\ncarro.ligado = true;\nconsole.log("Carro ligado");`, output: "Carro ligado" },
+                    { id: "ex08", title: "Ex 08. Total de Kills", concept: "Usar <code>.reduce()</code> para acumular total de kills.", example: "Somar um array de objetos (dados de equipe) em um único número.", code: `const team = [{k: 10}, {k: 20}, {k: 15}];\nconst total = team.reduce((acc, p) => acc + p.k, 0);\nconsole.log(total);`, output: "45" },
+                    { id: "ex09", title: "Ex 09. Validação de Lobby", concept: "Lançar erro se 'hp' não existir, capturar com try/catch.", example: "Validar se os dados vindos da API estão íntegros.", code: `try {\n  const player = { nome: "Noob" };\n  if (!player.hp) throw new Error("Jogador inválido");\n} catch (e) {\n  console.log(e.message);\n}`, output: "Jogador inválido" },
+                    { id: "ex10", title: "Ex 10. Fetch API (Mock)", concept: "Async/await com setTimeout e Promise.", example: "Simular a latência de rede ao buscar o perfil de um jogador.", code: `const getUser = () => new Promise(r => setTimeout(() => r({ nick: "Faker" }), 1000));\nasync function main() {\n  const user = await getUser();\n  console.log(user.nick);\n}\nmain();`, output: "Faker (após 1s)" }
+                ]
+            },
+            {
+                id: "mod3",
+                title: "Módulo 3: Avançado",
+                level: "Intermediário",
+                status: "bloqueado",
+                lessons: []
+            }
+        ];
+
+        // =====================================================================
+        // 🗄️ MOCK DATABASE (LOCALSTORAGE)
+        // =====================================================================
+        const DB = {
+            getUsers: () => JSON.parse(localStorage.getItem('@DevJourney:users')) || {},
+            saveUsers: (users) => localStorage.setItem('@DevJourney:users', JSON.stringify(users)),
+            getSession: () => JSON.parse(localStorage.getItem('@DevJourney:session')),
+            saveSession: (user) => localStorage.setItem('@DevJourney:session', JSON.stringify(user)),
+            logout: () => localStorage.removeItem('@DevJourney:session')
+        };
+
+        // =====================================================================
+        // 🔐 AUTENTICAÇÃO
+        // =====================================================================
+        const Auth = {
+            register: () => {
+                const user = document.getElementById('login-user').value;
+                const pass = document.getElementById('login-pass').value;
+                if (!user || !pass) return alert("Preencha todos os campos!");
+                const users = DB.getUsers();
+                if (users[user]) return alert("Usuário já existe!");
+                users[user] = { password: pass, progress: [] };
+                DB.saveUsers(users);
+                alert("Conta criada! Faça login.");
+            },
+            login: () => {
+                const user = document.getElementById('login-user').value;
+                const pass = document.getElementById('login-pass').value;
+                const users = DB.getUsers();
+                if (users[user] && users[user].password === pass) {
+                    DB.saveSession({ username: user });
+                    document.getElementById('login-modal').classList.remove('active');
+                    UI.renderUser(); UI.renderSidebar(); UI.updateProgress();
+                } else { alert("Usuário ou senha incorretos!"); }
+            },
+            logout: () => { DB.logout(); window.location.reload(); }
+        };
+
+        // =====================================================================
+        // 🖥️ INTERFACE DO USUÁRIO (UI)
+        // =====================================================================
+        const UI = {
+            init: () => {
+                UI.renderUser(); UI.renderSidebar(); UI.updateProgress();
+                document.getElementById('btn-start').addEventListener('click', () => {
+                    if (!DB.getSession()) {
+                        document.getElementById('login-modal').classList.add('active');
+                    } else {
+                        const session = DB.getSession();
+                        const progress = DB.getUsers()[session.username].progress;
+                        let nextLesson = null;
+                        let nextMod = null;
+                        for (const mod of Curriculum) {
+                            if (mod.status === 'bloqueado') continue;
+                            for (const lesson of mod.lessons) {
+                                if (!progress.includes(lesson.id)) {
+                                    nextLesson = lesson.id; nextMod = mod.id; break;
+                                }
+                            }
+                            if (nextLesson) break;
+                        }
+                        if (nextLesson) UI.loadLesson(nextLesson, nextMod);
+                        else alert("Você concluiu todo o módulo disponível! Aguarde novos lançamentos.");
+                    }
+                });
+            },
+
+            renderUser: () => {
+                const session = DB.getSession();
+                const container = document.getElementById('user-profile');
+                if (session) {
+                    container.innerHTML = `
+                        <div class="user-info">
+                            <div class="avatar">👤</div>
+                            <div><div class="user-name">${session.username}</div><div class="user-status">Estudante</div></div>
+                        </div>
+                        <button class="btn-login" style="width: auto; background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 4px 8px;" onclick="Auth.logout()">Sair</button>
+                    `;
+                    document.getElementById('progress-container').style.display = 'block';
+                } else {
+                    container.innerHTML = `<button class="btn-login" onclick="document.getElementById('login-modal').classList.add('active')">Fazer Login</button>`;
+                    document.getElementById('progress-container').style.display = 'none';
+                }
+            },
+
+            renderSidebar: () => {
+                const nav = document.getElementById('nav-menu'); nav.innerHTML = '';
+                const session = DB.getSession();
+                const progress = session ? DB.getUsers()[session.username].progress : [];
+
+                Curriculum.forEach(mod => {
+                    const titleEl = document.createElement('div');
+                    titleEl.className = 'module-title';
+                    titleEl.innerHTML = `${mod.title} <span class="badge">${mod.level}</span>`;
+                    nav.appendChild(titleEl);
+
+                    if (mod.status === 'bloqueado') {
+                        const lockEl = document.createElement('div');
+                        lockEl.className = 'nav-item locked';
+                        lockEl.innerHTML = `<span class="icon">🔒</span> Em breve`;
+                        nav.appendChild(lockEl);
+                    } else {
+                        mod.lessons.forEach(lesson => {
+                            const isCompleted = progress.includes(lesson.id);
+                            const el = document.createElement('div');
+                            el.className = `nav-item ${isCompleted ? 'completed' : ''}`;
+                            el.innerHTML = `<span class="icon">${isCompleted ? '✅' : '📄'}</span> ${lesson.title}`;
+                            el.onclick = () => UI.loadLesson(lesson.id, mod.id);
+                            nav.appendChild(el);
+                        });
+                    }
+                });
+            },
+
+            loadLesson: (lessonId, moduleId) => {
+                document.getElementById('hero-screen').style.display = 'none';
+                const screen = document.getElementById('lesson-screen');
+                screen.classList.add('active');
+
+                let lessonData = null; let modData = null;
+                for (const mod of Curriculum) {
+                    const found = mod.lessons.find(l => l.id === lessonId);
+                    if (found) { lessonData = found; modData = mod; break; }
+                }
+                if (!lessonData) return;
+
+                const session = DB.getSession();
+                const isCompleted = session ? DB.getUsers()[session.username].progress.includes(lessonId) : false;
+
+                const safeCode = lessonData.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                
+                screen.innerHTML = `
+                    <div class="level-guide">
+                        <h4>🎯 Objetivo do ${modData.title} (${modData.level})</h4>
+                        <p>${modData.moduleDesc}</p>
+                    </div>
+
+                    <div class="lesson-header">
+                        <span class="lesson-badge">${modData.title} • ${modData.level}</span>
+                        <h1>${lessonData.title}</h1>
+                        <div class="lesson-actions">
+                            <button class="btn-complete ${isCompleted ? 'done' : ''}" onclick="UI.toggleComplete('${lessonId}', '${moduleId}')">
+                                ${isCompleted ? '✅ Concluído' : '🟢 Marcar como Concluído'}
+                            </button>
+                            <button class="btn-download" onclick="UI.downloadCode('${lessonId}', \`${lessonData.code}\`)">
+                                ⬇️ Baixar .js
+                            </button>
+                        </div>
+                    </div>
+                    <div class="info-card"><h3>📖 Conceito</h3><p>${lessonData.concept}</p></div>
+                    <div class="info-card example"><h3>🌍 Assimilação Real</h3><p>${lessonData.example}</p></div>
+                    
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>${lessonId}.js</span>
+                            <span>VS Code Highlight</span>
+                        </div>
+                        <pre><code class="language-javascript">${safeCode}</code></pre>
+                    </div>
+
+                    <div class="output-block">
+                        <span class="term">$ node ${lessonId}.js</span>
+                        ${lessonData.output.replace(/\n/g, '<br>')}
+                    </div>
+                `;
+
+                Prism.highlightAll();
+            },
+
+            downloadCode: (lessonId, code) => {
+                const rawCode = code.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                const blob = new Blob([rawCode], { type: 'text/javascript' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${lessonId}.js`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            },
+
+            copyPix: (inputId, btnElement) => {
+                const input = document.getElementById(inputId);
+                input.select();
+                input.setSelectionRange(0, 99999); 
+                
+                navigator.clipboard.writeText(input.value).then(() => {
+                    const originalText = btnElement.innerText;
+                    btnElement.innerText = "✓ Copiado";
+                    btnElement.style.background = "var(--success)";
+                    btnElement.style.color = "#fff";
                     
                     setTimeout(() => {
-                        this.innerHTML = originalText;
-                        this.classList.remove('success');
+                        btnElement.innerText = originalText;
+                        btnElement.style.background = "var(--border)";
+                        btnElement.style.color = "var(--text-main)";
                     }, 2000);
+                }).catch(err => {
+                    alert("Erro ao copiar a chave.");
                 });
-            });
+            },
+
+            toggleComplete: (lessonId, moduleId) => {
+                const session = DB.getSession();
+                if (!session) return alert("Faça login para salvar seu progresso!");
+
+                const users = DB.getUsers();
+                const user = users[session.username];
+                
+                if (user.progress.includes(lessonId)) user.progress = user.progress.filter(id => id !== lessonId);
+                else user.progress.push(lessonId);
+
+                DB.saveUsers(users);
+                UI.loadLesson(lessonId, moduleId);
+                UI.renderSidebar();
+                UI.updateProgress();
+            },
+
+            updateProgress: () => {
+                const session = DB.getSession();
+                if (!session) return;
+                const progress = DB.getUsers()[session.username].progress;
+                let totalLessons = 0;
+                Curriculum.forEach(m => { if (m.status === 'aberto') totalLessons += m.lessons.length; });
+                const percent = Math.round((progress.length / totalLessons) * 100);
+                document.getElementById('progress-fill').style.width = `${percent}%`;
+                document.getElementById('progress-text').innerText = `${percent}%`;
+            }
+        };
+
+        // Inicializa o Tema e o Loader ao carregar a página
+        window.addEventListener('DOMContentLoaded', () => {
+            Theme.init();
+            Loader.init();
         });
     </script>
 </body>
