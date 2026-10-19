@@ -6,11 +6,6 @@
     <title>Fundamentos JS/TS | Plataforma de Ensino</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
-    <!-- PRISM.JS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-
     <!-- MONACO EDITOR -->
     <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/editor/editor.main.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
@@ -30,158 +25,165 @@
             --text-muted: #64748b; --success: #059669; --danger: #dc2626; --warning: #d97706;
         }
 
-        /* REMOVENDO SCROLLBARS GLOBAIS */
         ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
         * { scrollbar-width: none; -ms-overflow-style: none; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.2s, border-color 0.2s; }
+        body { font-family: var(--font-main); background-color: var(--bg-base); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; font-size: 13px; }
+
+        /* CONTROLE DE LAYOUT (TOPBAR vs SIDEBAR) */
+        body.in-hub .sidebar, body.in-welcome .sidebar { display: none !important; }
+        body.in-track .top-navbar { display: none !important; }
         
-        body { 
-            font-family: var(--font-main); 
-            background-color: var(--bg-base); 
-            color: var(--text-main); 
-            display: flex; 
-            height: 100vh; 
-            overflow: hidden; 
-            font-size: 13px; 
-        }
-
-        body.in-hub .context-only { display: none !important; }
-        body.in-track .context-only { display: block; }
-
-        /* TOAST */
-        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-        .toast { background: var(--bg-surface); border-left: 4px solid var(--primary); padding: 10px 16px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); color: var(--text-main); display: flex; align-items: center; gap: 10px; animation: slideIn 0.2s forwards; font-weight: 500; font-size: 0.85rem;}
-        .toast.success { border-left-color: var(--success); }
-        .toast.danger { border-left-color: var(--danger); }
-
-        /* TELA DE LOADING */
-        #loader-screen { position: fixed; inset: 0; background: var(--bg-base); z-index: 9998; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s; }
-        .loader-logo { width: 60px; height: 60px; object-fit: contain; margin-bottom: 1rem; animation: pulse 2s infinite; }
-        .loader-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .loader-text { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
-        .spinner { width: 20px; height: 20px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-
-        /* SIDEBAR */
-        .sidebar { width: 250px; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; }
-        .brand { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        .brand-left { display: flex; align-items: center; gap: 8px; }
-        .brand-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
+        /* TOP NAVBAR (Para telas iniciais) */
+        .top-navbar { height: 60px; background: var(--bg-surface); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 2rem; z-index: 10; }
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .brand-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
         .brand-icon img { width: 100%; height: 100%; object-fit: contain; }
-        .brand h1 { font-size: 0.9rem; font-weight: 700; }
+        .brand h1 { font-size: 1.1rem; font-weight: 800; }
+        .nav-actions { display: flex; align-items: center; gap: 12px; }
+        .nav-btn { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .nav-btn:hover { background: var(--bg-surface-hover); }
+        .nav-btn.primary { background: var(--primary); border-color: var(--primary); color: white; }
+        .nav-btn.primary:hover { background: var(--primary-hover); }
+
+        /* SIDEBAR (Para tela de trilha) */
+        .app-body { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 250px; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; }
+        .sidebar-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
         
-        .user-profile { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); }
-        .user-stats { display: flex; justify-content: space-between; margin-bottom: 8px; background: var(--bg-base); padding: 6px; border-radius: 6px; border: 1px solid var(--border); }
+        .user-profile { padding: 1rem; border-bottom: 1px solid var(--border); }
+        .user-stats { display: flex; justify-content: space-between; margin-bottom: 10px; background: var(--bg-base); padding: 8px; border-radius: 6px; border: 1px solid var(--border); }
         .stat-item { text-align: center; flex: 1; }
-        .stat-value { font-weight: 700; font-size: 0.85rem; color: var(--primary); }
+        .stat-value { font-weight: 700; font-size: 0.9rem; color: var(--primary); }
         .stat-label { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; }
         .streak-fire { color: var(--warning); }
 
-        .search-box { padding: 0 1rem 0.8rem 1rem; }
+        .search-box { padding: 0 1rem 1rem 1rem; }
         .search-box input { width: 100%; padding: 6px 10px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 4px; color: var(--text-main); font-family: var(--font-main); outline: none; font-size: 0.8rem; }
         .search-box input:focus { border-color: var(--primary); }
-        .btn-encyclopedia { margin: 0 1rem 0.8rem 1rem; width: calc(100% - 2rem); padding: 6px; background: var(--primary-glow); border: 1px solid var(--primary); color: var(--primary); border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
+        
+        .btn-encyclopedia { margin: 0 1rem 1rem 1rem; width: calc(100% - 2rem); padding: 8px; background: var(--primary-glow); border: 1px solid var(--primary); color: var(--primary); border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
         .btn-encyclopedia:hover { background: var(--primary); color: white; }
 
         .nav-menu { flex: 1; overflow-y: auto; padding: 0.5rem 0; }
-        .nav-item { padding: 0.5rem 1rem; display: flex; align-items: center; gap: 8px; cursor: pointer; border-left: 2px solid transparent; font-size: 0.8rem; color: var(--text-muted); }
+        .nav-item { padding: 0.6rem 1rem; display: flex; align-items: center; gap: 8px; cursor: pointer; border-left: 2px solid transparent; font-size: 0.85rem; color: var(--text-muted); }
         .nav-item:hover:not(.locked) { background: var(--bg-surface-hover); color: var(--text-main); }
         .nav-item.completed { color: var(--text-main); }
         .nav-item.completed .icon { color: var(--success); }
         .nav-item.active { background: var(--primary-glow); border-left-color: var(--primary); color: var(--primary); font-weight: 500; }
+        .nav-item.locked { opacity: 0.5; cursor: not-allowed; }
         
-        .module-title { padding: 1rem 1rem 0.4rem 1rem; font-size: 0.65rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .module-title { padding: 1rem 1rem 0.4rem 1rem; font-size: 0.65rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;}
 
-        .sidebar-footer { padding: 0.8rem 1rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
-        .btn-sidebar { width: 100%; padding: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-main); border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;}
+        .sidebar-footer { padding: 1rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+        .btn-sidebar { width: 100%; padding: 8px; background: transparent; border: 1px solid var(--border); color: var(--text-main); border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;}
         .btn-sidebar:hover { background: var(--bg-surface-hover); }
         .btn-sidebar.primary { background: var(--primary); border-color: var(--primary); color: white; }
 
         /* MAIN CONTENT */
         .main-content { flex: 1; overflow-y: auto; position: relative; background: radial-gradient(circle at 50% 0%, var(--primary-glow) 0%, transparent 40%); display: flex; flex-direction: column; align-items: center; }
         
+        /* TELA INICIAL (WELCOME) */
+        .welcome-screen { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; height: 100%; padding: 4rem; width: 100%; max-width: 900px; animation: fadeIn 0.4s; }
+        .welcome-badge { background: var(--primary-glow); color: var(--primary); border: 1px solid var(--primary); padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; margin-bottom: 1.5rem; }
+        .welcome-screen h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; color: var(--text-main); }
+        .welcome-screen p { font-size: 1.1rem; color: var(--text-muted); max-width: 600px; line-height: 1.6; margin-bottom: 2rem; }
+        .btn-start { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 15px var(--primary-glow); }
+        .btn-start:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
         /* HUB DE TRILHAS */
-        .hub-screen { padding: 3rem 2rem; width: 100%; max-width: 900px; animation: fadeIn 0.3s; }
+        .hub-screen { padding: 3rem 2rem; width: 100%; max-width: 900px; animation: fadeIn 0.3s; display: none; flex-direction: column; align-items: center;}
         .hub-header { text-align: center; margin-bottom: 2.5rem; }
         .hub-header h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-main); }
         .hub-header p { color: var(--text-muted); font-size: 0.95rem; }
         
-        .tracks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.2rem; justify-content: center; }
-        .track-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column;}
-        .track-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 8px 20px var(--primary-glow); }
-        .track-icon { font-size: 2.2rem; margin-bottom: 0.8rem; }
-        .track-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; }
-        .track-desc { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.2rem; line-height: 1.5; flex: 1;}
-        .track-meta { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
-        .badge { background: var(--bg-base); border: 1px solid var(--border); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 500;}
-        .progress-bar { width: 100%; height: 5px; background: var(--bg-base); border-radius: 3px; overflow: hidden;}
+        .tracks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; justify-content: center; width: 100%; }
+        .track-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column;}
+        .track-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: 0 10px 25px var(--primary-glow); }
+        .track-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+        .track-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .track-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5; flex: 1;}
+        .track-meta { display: flex; gap: 8px; margin-bottom: 1.2rem; flex-wrap: wrap; }
+        .badge { background: var(--bg-base); border: 1px solid var(--border); padding: 3px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 500;}
+        .progress-bar { width: 100%; height: 6px; background: var(--bg-base); border-radius: 3px; overflow: hidden;}
         .progress-fill { height: 100%; background: var(--primary); border-radius: 3px; }
 
         /* TELA DE AULA */
-        .lesson-screen { padding: 2rem; max-width: 850px; width: 100%; display: none; animation: fadeIn 0.2s; }
-        .lesson-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: var(--bg-surface); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); }
+        .lesson-screen { padding: 2rem; max-width: 850px; width: 100%; display: none; animation: fadeIn 0.3s; }
+        .lesson-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: var(--bg-surface); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border); }
         .action-btns { display: flex; gap: 10px; }
-        .btn-icon { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.8rem; transition: 0.2s; display: flex; align-items: center; gap: 4px;}
+        .btn-icon { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
         .btn-icon:hover { color: var(--primary); }
         .btn-icon.starred { color: var(--warning); }
 
-        .lesson-header h1 { font-size: 1.6rem; margin-bottom: 1rem; }
-        .lesson-actions { display: flex; gap: 8px; margin-bottom: 1.5rem; }
-        .btn-complete { background: transparent; border: 1px solid var(--success); color: var(--success); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .lesson-header h1 { font-size: 1.8rem; margin-bottom: 1.2rem; }
+        .lesson-actions { display: flex; gap: 10px; margin-bottom: 2rem; }
+        .btn-complete { background: transparent; border: 1px solid var(--success); color: var(--success); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
         .btn-complete:hover { background: rgba(16, 185, 129, 0.1); }
         .btn-complete.done { background: var(--success); color: white; }
-        .btn-download { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-download { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
         .btn-download:hover { background: var(--primary-glow); }
 
-        .info-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.2rem; }
-        .info-card h3 { font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-main); display: flex; align-items: center; gap: 6px;}
-        .info-card p { color: var(--text-muted); line-height: 1.6; font-size: 0.85rem;}
-        .info-card.example { border-left: 3px solid var(--primary); background: linear-gradient(90deg, var(--primary-glow) 0%, var(--bg-surface) 100%); }
+        .info-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.2rem; }
+        .info-card h3 { font-size: 1rem; margin-bottom: 0.8rem; color: var(--text-main); display: flex; align-items: center; gap: 6px;}
+        .info-card p { color: var(--text-muted); line-height: 1.7; font-size: 0.9rem;}
+        .info-card.example { border-left: 4px solid var(--primary); background: linear-gradient(90deg, var(--primary-glow) 0%, var(--bg-surface) 100%); }
         
         .notes-area { width: 100%; height: 80px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 6px; padding: 10px; color: var(--text-main); font-family: var(--font-main); resize: none; outline: none; margin-top: 8px; font-size: 0.85rem; }
         .notes-area:focus { border-color: var(--primary); }
 
-        .playground-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .btn-run { background: var(--success); color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.8rem;}
-        #monaco-editor { width: 100%; height: 220px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 8px; }
-        .console-output { background: #000; color: #10b981; padding: 10px; border-radius: 6px; font-family: var(--font-code); font-size: 0.8rem; min-height: 50px; white-space: pre-wrap; border: 1px solid var(--border); }
+        .playground-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .btn-run { background: var(--success); color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem;}
+        #monaco-editor { width: 100%; height: 220px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 10px; }
+        .console-output { background: #000; color: #10b981; padding: 12px; border-radius: 6px; font-family: var(--font-code); font-size: 0.85rem; min-height: 50px; white-space: pre-wrap; border: 1px solid var(--border); }
 
         /* MODAIS */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: 100; }
         .modal-overlay.active { display: flex; }
-        .modal { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; width: 100%; max-width: 350px; position: relative; animation: scaleIn 0.2s; }
+        .modal { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 2rem; width: 100%; max-width: 380px; position: relative; animation: scaleIn 0.2s; }
         
-        .profile-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
-        .profile-avatar { width: 60px; height: 60px; border-radius: 50%; background: var(--bg-base); border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 0.8rem; }
-        .profile-name { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
-        .profile-level { font-size: 0.8rem; color: var(--primary); font-weight: 600; margin-top: 4px; }
+        .profile-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
+        .profile-avatar { width: 70px; height: 70px; border-radius: 50%; background: var(--bg-base); border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 1rem; }
+        .profile-name { font-size: 1.3rem; font-weight: 700; color: var(--text-main); }
+        .profile-level { font-size: 0.9rem; color: var(--primary); font-weight: 600; margin-top: 5px; }
 
-        .input-group { margin-bottom: 0.8rem; }
-        .input-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; }
-        .input-group input { width: 100%; padding: 8px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 4px; color: var(--text-main); outline: none; font-size: 0.85rem;}
-        .modal-btns { display: flex; gap: 8px; margin-top: 1.2rem; }
-        .btn-primary { flex: 1; background: var(--primary); color: white; padding: 8px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem;}
-        .btn-secondary { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 8px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;}
-        .btn-close { position: absolute; top: 0.8rem; right: 0.8rem; background: transparent; border: none; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; }
+        .input-group { margin-bottom: 1rem; }
+        .input-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
+        .input-group input { width: 100%; padding: 10px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 6px; color: var(--text-main); outline: none; font-size: 0.9rem;}
+        .modal-btns { display: flex; gap: 10px; margin-top: 1.5rem; }
+        .btn-primary { flex: 1; background: var(--primary); color: white; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem;}
+        .btn-secondary { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.9rem;}
+        .btn-close { position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
 
-        /* ENCICLOPÉDIA */
-        .encyclopedia-screen { padding: 2.5rem 2rem; width: 100%; max-width: 900px; display: none; animation: fadeIn 0.3s; }
-        .encyclopedia-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.2rem; margin-top: 1.5rem; }
-        .op-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; }
-        .op-card h3 { font-size: 1rem; color: var(--primary); margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
-        .op-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; font-size: 0.85rem; }
-        .op-symbol { font-family: var(--font-code); background: var(--bg-base); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); color: var(--warning); font-weight: bold; }
-        .op-desc { color: var(--text-muted); text-align: right; font-size: 0.75rem;}
+        .encyclopedia-screen { padding: 3rem 2rem; width: 100%; max-width: 900px; display: none; animation: fadeIn 0.3s; }
+        .encyclopedia-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .op-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+        .op-card h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        .op-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; font-size: 0.9rem; }
+        .op-symbol { font-family: var(--font-code); background: var(--bg-base); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); color: var(--warning); font-weight: bold; }
+        .op-desc { color: var(--text-muted); text-align: right; font-size: 0.8rem;}
+
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast { background: var(--bg-surface); border-left: 4px solid var(--primary); padding: 10px 16px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); color: var(--text-main); display: flex; align-items: center; gap: 10px; animation: slideIn 0.2s forwards; font-weight: 500; font-size: 0.85rem; z-index: 10000;}
+        .toast.success { border-left-color: var(--success); }
+        .toast.danger { border-left-color: var(--danger); }
+
+        #loader-screen { position: fixed; inset: 0; background: var(--bg-base); z-index: 9998; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s; }
+        .loader-logo { width: 60px; height: 60px; object-fit: contain; margin-bottom: 1rem; animation: pulse 2s infinite; }
+        .loader-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .loader-text { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+        .spinner { width: 20px; height: 20px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
     </style>
 </head>
-<body class="in-hub">
+<body class="in-welcome">
 
     <div id="loader-screen">
         <img src="jsbase.gif" alt="Logo" class="loader-logo">
@@ -192,95 +194,108 @@
 
     <div id="toast-container"></div>
 
-    <aside class="sidebar" id="main-sidebar">
+    <!-- TOP NAVBAR (SÓ APARECE NAS TELAS INICIAIS) -->
+    <header class="top-navbar">
         <div class="brand">
-            <div class="brand-left">
-                <div class="brand-icon"><img src="jsbase.gif" alt="Logo"></div>
-                <h1>Fundamentos</h1>
-            </div>
-            <button class="theme-toggle btn-icon" onclick="Theme.toggle()">🌓</button>
+            <div class="brand-icon"><img src="jsbase.gif" alt="Logo"></div>
+            <h1>Fundamentos</h1>
         </div>
-
-        <div class="user-profile" id="user-profile"></div>
-
-        <div class="search-box context-only">
-            <input type="text" id="global-search" placeholder="🔍 Buscar aula..." oninput="UI.filterLessons(this.value)">
+        <div class="nav-actions">
+            <button class="nav-btn" onclick="Theme.toggle()">🌓 Tema</button>
+            <button class="nav-btn" onclick="UI.openProfile()">👤 Minha Conta</button>
+            <button class="nav-btn primary" onclick="document.getElementById('donate-modal').classList.add('active')">☕ Apoiar</button>
         </div>
-        <button class="btn-encyclopedia context-only" onclick="UI.showEncyclopedia()">
-            📚 Enciclopédia JS
-        </button>
+    </header>
 
-        <nav class="nav-menu" id="nav-menu"></nav>
-
-        <div class="sidebar-footer">
-            <button class="btn-sidebar context-only" onclick="UI.showHub()">🏠 Voltar para Trilhas</button>
-            <button class="btn-sidebar primary" onclick="document.getElementById('donate-modal').classList.add('active')">☕ Apoiar Projeto</button>
-        </div>
-    </aside>
-
-    <main class="main-content" id="main-content">
-        
-        <div class="hub-screen" id="hub-screen">
-            <div class="hub-header">
-                <h2>Qual trilha vamos dominar hoje?</h2>
-                <p>Escolha seu caminho e comece a codar.</p>
-            </div>
-            <div class="tracks-grid" id="tracks-grid"></div>
-        </div>
-
-        <div class="lesson-screen" id="lesson-screen"></div>
-
-        <div class="encyclopedia-screen" id="encyclopedia-screen">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <div>
-                    <h2 style="font-size: 1.5rem; font-weight: 800;">Enciclopédia JS</h2>
-                    <p style="color: var(--text-muted); font-size: 0.85rem;">Sua cola mental para consulta rápida.</p>
+    <div class="app-body">
+        <!-- SIDEBAR (SÓ APARECE NA TRILHA) -->
+        <aside class="sidebar" id="main-sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-icon" style="width:24px; height:24px;"><img src="jsbase.gif" alt="Logo"></div>
+                    <h1 style="font-size:0.9rem;">Estudando</h1>
                 </div>
-                <button class="btn-secondary" onclick="UI.backToLesson()" style="flex: none; padding: 6px 16px;">Voltar para Aula</button>
             </div>
+
+            <div class="user-profile" id="user-profile"></div>
+
+            <div class="search-box">
+                <input type="text" id="global-search" placeholder="🔍 Buscar aula..." oninput="UI.filterLessons(this.value)">
+            </div>
+            <button class="btn-encyclopedia" onclick="UI.showEncyclopedia()">
+                📚 Enciclopédia JS
+            </button>
+
+            <nav class="nav-menu" id="nav-menu"></nav>
+
+            <div class="sidebar-footer">
+                <button class="btn-sidebar" onclick="UI.showHub()">🏠 Voltar para Trilhas</button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content" id="main-content">
             
-            <div class="encyclopedia-grid">
-                <div class="op-card">
-                    <h3>➕ Aritméticos</h3>
-                    <div class="op-item"><span class="op-symbol">+</span> <span class="op-desc">Adição / Concatenação</span></div>
-                    <div class="op-item"><span class="op-symbol">-</span> <span class="op-desc">Subtração</span></div>
-                    <div class="op-item"><span class="op-symbol">*</span> <span class="op-desc">Multiplicação</span></div>
-                    <div class="op-item"><span class="op-symbol">/</span> <span class="op-desc">Divisão</span></div>
-                    <div class="op-item"><span class="op-symbol">%</span> <span class="op-desc">Resto da Divisão</span></div>
-                </div>
+            <div class="welcome-screen" id="welcome-screen">
+                <div class="welcome-badge">Plataforma de Ensino</div>
+                <h1>Domine a base do Backend.</h1>
+                <p>Documentação interativa da minha transição de carreira. Aprenda lógica, arquitetura e resolução de problemas com 45 aulas práticas do mundo dos jogos e do mercado.</p>
+                <button class="btn-start" onclick="UI.showHub()">
+                    ▶️ Iniciar Estudos
+                </button>
+            </div>
 
-                <div class="op-card">
-                    <h3>⚖️ Comparação</h3>
-                    <div class="op-item"><span class="op-symbol">===</span> <span class="op-desc">Estritamente Igual</span></div>
-                    <div class="op-item"><span class="op-symbol">!==</span> <span class="op-desc">Estritamente Diferente</span></div>
-                    <div class="op-item"><span class="op-symbol">></span> <span class="op-desc">Maior que</span></div>
-                    <div class="op-item"><span class="op-symbol"><</span> <span class="op-desc">Menor que</span></div>
-                    <div class="op-item"><span class="op-symbol">>=</span> <span class="op-desc">Maior ou Igual</span></div>
+            <div class="hub-screen" id="hub-screen">
+                <div class="hub-header">
+                    <h2>Qual trilha vamos dominar hoje?</h2>
+                    <p>Escolha seu caminho e comece a codar.</p>
                 </div>
+                <div class="tracks-grid" id="tracks-grid"></div>
+            </div>
 
-                <div class="op-card">
-                    <h3>🧠 Lógicos</h3>
-                    <div class="op-item"><span class="op-symbol">&&</span> <span class="op-desc">E (AND)</span></div>
-                    <div class="op-item"><span class="op-symbol">||</span> <span class="op-desc">OU (OR)</span></div>
-                    <div class="op-item"><span class="op-symbol">!</span> <span class="op-desc">NÃO (NOT)</span></div>
+            <div class="lesson-screen" id="lesson-screen"></div>
+
+            <div class="encyclopedia-screen" id="encyclopedia-screen">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div>
+                        <h2 style="font-size: 1.6rem; font-weight: 800;">Enciclopédia JS</h2>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Sua cola mental para consulta rápida.</p>
+                    </div>
+                    <button class="btn-secondary" onclick="UI.backToLesson()" style="flex: none; padding: 8px 20px;">Voltar para Aula</button>
                 </div>
-
-                <div class="op-card">
-                    <h3>💾 Atribuição</h3>
-                    <div class="op-item"><span class="op-symbol">=</span> <span class="op-desc">Atribuição Simples</span></div>
-                    <div class="op-item"><span class="op-symbol">+=</span> <span class="op-desc">x = x + y</span></div>
-                    <div class="op-item"><span class="op-symbol">++</span> <span class="op-desc">Incremento (+1)</span></div>
-                    <div class="op-item"><span class="op-symbol">--</span> <span class="op-desc">Decremento (-1)</span></div>
+                
+                <div class="encyclopedia-grid">
+                    <div class="op-card">
+                        <h3>➕ Aritméticos</h3>
+                        <div class="op-item"><span class="op-symbol">+</span> <span class="op-desc">Adição / Concatenação</span></div>
+                        <div class="op-item"><span class="op-symbol">-</span> <span class="op-desc">Subtração</span></div>
+                        <div class="op-item"><span class="op-symbol">*</span> <span class="op-desc">Multiplicação</span></div>
+                        <div class="op-item"><span class="op-symbol">/</span> <span class="op-desc">Divisão</span></div>
+                        <div class="op-item"><span class="op-symbol">%</span> <span class="op-desc">Resto da Divisão</span></div>
+                    </div>
+                    <div class="op-card">
+                        <h3>⚖️ Comparação</h3>
+                        <div class="op-item"><span class="op-symbol">===</span> <span class="op-desc">Estritamente Igual</span></div>
+                        <div class="op-item"><span class="op-symbol">!==</span> <span class="op-desc">Estritamente Diferente</span></div>
+                        <div class="op-item"><span class="op-symbol">></span> <span class="op-desc">Maior que</span></div>
+                        <div class="op-item"><span class="op-symbol"><</span> <span class="op-desc">Menor que</span></div>
+                    </div>
+                    <div class="op-card">
+                        <h3>🧠 Lógicos</h3>
+                        <div class="op-item"><span class="op-symbol">&&</span> <span class="op-desc">E (AND)</span></div>
+                        <div class="op-item"><span class="op-symbol">||</span> <span class="op-desc">OU (OR)</span></div>
+                        <div class="op-item"><span class="op-symbol">!</span> <span class="op-desc">NÃO (NOT)</span></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-    </main>
+        </main>
+    </div>
 
     <!-- MODAL LOGIN -->
     <div class="modal-overlay" id="login-modal">
         <div class="modal">
-            <h2 style="text-align: center; margin-bottom: 1.2rem; font-size:1.1rem;">Acessar Plataforma</h2>
+            <h2 style="text-align: center; margin-bottom: 1.5rem; font-size:1.2rem;">Acessar Plataforma</h2>
             <div class="input-group"><label>Usuário</label><input type="text" id="login-user"></div>
             <div class="input-group"><label>Senha</label><input type="password" id="login-pass"></div>
             <div class="modal-btns">
@@ -313,10 +328,10 @@
     <div class="modal-overlay" id="donate-modal">
         <div class="modal">
             <button class="btn-close" onclick="document.getElementById('donate-modal').classList.remove('active')">✕</button>
-            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 1.1rem;">Apoie o Projeto ☕</h2>
-            <p style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem;">Sua contribuição me incentiva a continuar criando conteúdo de qualidade!</p>
-            <div style="text-align: center; margin-bottom: 1rem;">
-                <img src="qrcode.jpeg" alt="QR Code" style="width: 120px; border-radius: 8px; border: 1px solid var(--border); background: #fff;">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 1.2rem;">Apoie o Projeto ☕</h2>
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Sua contribuição me incentiva a continuar criando conteúdo!</p>
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <img src="qrcode.jpeg" alt="QR Code" style="width: 140px; border-radius: 8px; border: 1px solid var(--border); background: #fff;">
             </div>
             <div class="input-group">
                 <label>Chave Aleatória</label>
@@ -328,7 +343,7 @@
             <div class="input-group">
                 <label>Chave Fixa (Email)</label>
                 <div style="display: flex; gap: 5px;">
-                    <input type="text" value="tauamiguel77@gmail.com" readonly style="font-size: 0.8rem;">
+                    <input type="text" value="tauamiguel77@gmail.com" readonly style="font-size: 0.85rem;">
                     <button class="btn-primary" style="flex: none; padding: 0 10px; font-size: 0.75rem;" onclick="UI.copyPix(this, 'tauamiguel77@gmail.com')">Copiar</button>
                 </div>
             </div>
@@ -339,58 +354,93 @@
     <div class="modal-overlay" id="cert-modal">
         <div class="modal">
             <button class="btn-close" onclick="document.getElementById('cert-modal').classList.remove('active')">✕</button>
-            <h2 style="text-align: center; color: var(--success); font-size: 1.1rem;">🎓 Parabéns!</h2>
-            <p style="text-align: center; margin: 0.5rem 0 1rem 0; font-size: 0.85rem;">Você concluiu a trilha com sucesso!</p>
-            <canvas id="cert-canvas" width="400" height="280" style="width: 100%; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 1rem;"></canvas>
-            <a id="download-cert" class="btn-primary" style="display: block; text-align: center; text-decoration: none; padding: 8px; font-size: 0.85rem;">Baixar Certificado</a>
+            <h2 style="text-align: center; color: var(--success); font-size: 1.2rem;">🎓 Parabéns!</h2>
+            <p style="text-align: center; margin: 0.5rem 0 1rem 0; font-size: 0.9rem;">Você concluiu a trilha com sucesso!</p>
+            <canvas id="cert-canvas" width="400" height="280" style="width: 100%; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 1.5rem;"></canvas>
+            <a id="download-cert" class="btn-primary" style="display: block; text-align: center; text-decoration: none; padding: 10px; font-size: 0.9rem;">Baixar Certificado</a>
         </div>
     </div>
 
     <script>
         // =====================================================================
-        // 📚 BANCO DE DADOS EXPANDIDO (EXEMPLOS E DESAFIOS RICOS)
+        // 📚 BANCO DE DADOS COMPLETO (45 AULAS RESTAURADAS)
         // =====================================================================
         const Tracks = [
             {
                 id: "track_js",
-                title: "JavaScript Backend",
-                desc: "Do zero absoluto ao domínio de lógica, arrays, objetos e assincronismo.",
+                title: "JavaScript Backend PRO",
+                desc: "Do zero absoluto ao domínio de lógica, arquitetura, e concorrência. 45 aulas com contexto de mercado.",
                 icon: "🟨",
-                level: "Básico",
+                level: "Básico ao Avançado",
                 modules: [
                     {
-                        id: "mod1", title: "Módulo 1: Fundamentos", level: "Básico",
+                        id: "mod1", title: "Módulo 1: Fundamentos da Linguagem", level: "Básico", status: "aberto",
                         lessons: [
-                            { id: "aula01", title: "01. Variáveis e Escopo", concept: "Variáveis são caixas na memória. Usamos <code>const</code> para valores imutáveis e <code>let</code> para mutáveis. O <code>var</code> vaza escopo de bloco e causa bugs graves em projetos grandes.", exampleTitle: "O Inventário do Jogo", exampleDesc: "Criamos uma constante (imutável) para o nome do jogador, pois ele não muda no meio da partida. Criamos uma variável (mutável) para o HP, que sofre subtração ao levar dano.", code: `const jogador = "Faker";\nlet hp = 100;\n\n// O jogador tomou 30 de dano\nhp = hp - 30; \n\nconsole.log("Jogador: " + jogador);\nconsole.log("HP Restante: " + hp);`, output: "Jogador: Faker\nHP Restante: 70" },
-                            { id: "aula02", title: "02. Tipos e Conversão", concept: "O JS tenta adivinhar tipos. Somar texto com número gera concatenação (junta tudo). Use <code>Number()</code> ou <code>parseInt()</code> para forçar o tipo numérico e evitar bugs matemáticos.", exampleTitle: "A Armadilha da API", exampleDesc: "O backend enviou o dano como texto ('50'). Se somarmos com a defesa (20), o resultado vira '5020' (erro grave). Usamos <code>Number()</code> para converter e calcular corretamente.", code: `const danoString = "50";\nconst defesa = 20;\n\nconsole.log(danoString + defesa); // "5020"\n\nconst danoReal = Number(danoString) - defesa;\nconsole.log(danoReal);`, output: "5020\n30" },
-                            { id: "aula03", title: "03. Condicionais (If/Else)", concept: "O cérebro do código. Usamos <code>if</code> e <code>else</code> combinados com operadores lógicos <code>&&</code> (E) e <code>||</code> (OU). Para casos com muitas opções, usamos <code>switch case</code>.", exampleTitle: "Matchmaking Ranqueado", exampleDesc: "Para entrar na ranqueada, o jogador precisa ter Nível >= 10 E ter comprado o jogo original. Se ele falhar em qualquer uma, cai no else e é bloqueado.", code: `const nivel = 15;\nconst temJogo = true;\n\nif (nivel >= 10 && temJogo) {\n    console.log("✅ Entrando na fila...");\n} else {\n    console.log("❌ Acesso negado.");\n}`, output: "✅ Entrando na fila..." },
-                            { id: "aula04", title: "04. Loops (For/While)", concept: "Automação. O laço <code>for</code> repete um bloco um número conhecido de vezes. O <code>while</code> repete até a condição falhar (útil quando não se sabe o limite).", exampleTitle: "Spawnando Inimigos", exampleDesc: "Em vez de copiar o código 3 vezes para criar 3 inimigos, usamos um loop for que começa em 1 e vai até 3, executando o console.log a cada iteração.", code: `for (let i = 1; i <= 3; i++) {\n    console.log("Inimigo " + i + " spawnado!");\n}`, output: "Inimigo 1 spawnado!\nInimigo 2 spawnado!\nInimigo 3 spawnado!" }
+                            { id: "aula01", title: "01. Variáveis e Escopo", concept: "Variáveis são a base de qualquer software. No JS moderno, usamos <code>const</code> por padrão, pois ele impede a reatribuição acidental. O <code>let</code> é usado apenas quando o valor precisa mudar. A keyword <code>var</code> foi banida das boas práticas pois não respeita escopo de bloco.", exampleTitle: "O Bug do Vazamento de Escopo", exampleDesc: "Se usarmos var dentro de um if, a variável vaza e pode sobrescrever dados fora do bloco. Com let e const, o JS isola o escopo e protege a memória.", code: `const nomeJogador = "Faker";\nlet hpAtual = 100;\nhpAtual = hpAtual - 30;\nconsole.log(\`Jogador: \${nomeJogador}\`);\nconsole.log(\`HP Restante: \${hpAtual}\`);`, output: "Jogador: Faker\nHP Restante: 70" },
+                            { id: "aula02", title: "02. Tipagem e Conversão", concept: "JavaScript é de tipagem fraca. Se você somar um texto (string) com um número, ele vai juntar os dois (concatenar). Para evitar bugs graves em produção, usamos Number() ou parseInt() para converter dados de APIs.", exampleTitle: "O Bug de Dano '5020'", exampleDesc: "A API envia o ataque como string '50'. Se você somar com a defesa 20, o jogador levará '5020' de dano. O código abaixo converte e evita a tragédia.", code: `const danoString = "50";\nconst defesa = 20;\nconsole.log("Erro: " + (danoString + defesa));\nconst danoReal = Number(danoString) + defesa;\nconsole.log("Dano Real: " + danoReal);`, output: "Erro: 5020\nDano Real: 70" },
+                            { id: "aula03", title: "03. Operadores Aritméticos", concept: "A matemática no código segue a mesma ordem da escola (PEMDAS). O operador % (módulo) retorna o resto da divisão e é muito usado para descobrir se um número é par, ímpar ou múltiplo.", exampleTitle: "Cálculo de Dano Crítico", exampleDesc: "O dano crítico é calculado multiplicando o ataque base pelo multiplicador e somando bônus aditivos.", code: `const ataque = 100;\nconst multCritico = 2.5;\nconst bonus = 50;\nconst danoFinal = (ataque * multCritico) + bonus;\nconsole.log("Dano Final: " + danoFinal);\nconsole.log("10 é par? " + (10 % 2 === 0));`, output: "Dano Final: 300\n10 é par? true" },
+                            { id: "aula04", title: "04. Operadores Lógicos", concept: "Os operadores lógicos && (E) e || (OU) são a base da tomada de decisão. O && só retorna true se ambos forem verdadeiros. O || retorna true se pelo menos um for. Usamos também o ! (NOT) para inverter.", exampleTitle: "Sistema de Matchmaking", exampleDesc: "Para entrar na fila do ranqueado, o jogador precisa ter Nível >= 10 E ter o jogo original. Se ele for banido (!banido), ele não entra.", code: `const nivel = 15;\nconst temJogo = true;\nconst estaBanido = false;\nif (nivel >= 10 && temJogo && !estaBanido) {\n    console.log("✅ Entrando na fila...");\n}`, output: "✅ Entrando na fila..." },
+                            { id: "aula05", title: "05. Condicionais (If/Else)", concept: "O controle de fluxo permite que o código tome caminhos diferentes. O if verifica uma condição. O else if adiciona mais verificações e o else captura tudo que não passou.", exampleTitle: "Rankeamento de Notas", exampleDesc: "Se o KDA for acima de 10 é MVP. Se for maior que 5 é Bom. Se não passar, cai no else.", code: `const kda = 8.5;\nif (kda >= 10) {\n    console.log("MVP");\n} else if (kda >= 5) {\n    console.log("Bom Jogador");\n} else {\n    console.log("Precisa treinar");\n}`, output: "Bom Jogador" },
+                            { id: "aula06", title: "06. Switch Case", concept: "Quando você tem uma variável que pode assumir vários valores exatos, o switch é mais limpo que uma cadeia de if/else. O break é obrigatório para parar a execução.", exampleTitle: "Escolha de Classe", exampleDesc: "O jogador aperta 1 para Guerreiro ou 2 para Mago.", code: `const escolha = 2;\nswitch (escolha) {\n    case 1: console.log("Guerreiro"); break;\n    case 2: console.log("Mago"); break;\n    default: console.log("Desconhecido");\n}`, output: "Mago" },
+                            { id: "aula07", title: "07. Loops (For)", concept: "O laço for é usado quando você sabe exatamente o número de iterações. Ele possui inicialização, condição e incremento.", exampleTitle: "Spawn de Inimigos", exampleDesc: "Gerar 5 inimigos no mapa no início da rodada.", code: `for (let i = 1; i <= 5; i++) {\n    console.log("Inimigo " + i + " spawnado!");\n}`, output: "Inimigo 1 spawnado!\n...\nInimigo 5 spawnado!" },
+                            { id: "aula08", title: "08. Loops (While)", concept: "O while é usado quando você NÃO sabe quantas vezes o código vai rodar, mas sabe a condição de parada. Se a condição for sempre verdadeira, ocorre um loop infinito.", exampleTitle: "Jogando enquanto Vivo", exampleDesc: "O jogo continua enquanto a vida for maior que zero.", code: `let vida = 3;\nwhile (vida > 0) {\n    console.log("Jogando... Restam " + vida + " vidas");\n    vida--;\n}\nconsole.log("GAME OVER");`, output: "Jogando... Restam 3 vidas\nJogando... Restam 2 vidas\nJogando... Restam 1 vidas\nGAME OVER" },
+                            { id: "aula09", title: "09. Break e Continue", concept: "O break encerra o loop inteiro. O continue pula a iteração atual sem executar o resto do código daquela rodada.", exampleTitle: "Pulando o Chefe", exampleDesc: "Se o inimigo for 2, pula. Se for 4, para o loop.", code: `for (let i = 1; i <= 5; i++) {\n    if (i === 2) continue;\n    if (i === 4) break;\n    console.log("Atacando " + i);\n}`, output: "Atacando 1\nAtacando 3" },
+                            { id: "aula10", title: "10. Escopo de Bloco", concept: "Variáveis declaradas com let e const dentro de chaves { } morrem quando o bloco termina. Isso protege o sistema.", exampleTitle: "Segredo do If", exampleDesc: "Uma variável criada dentro de um if não existe fora dele.", code: `if (true) {\n    let vidaSecreta = 100;\n    console.log("Dentro: " + vidaSecreta);\n}\n// console.log(vidaSecreta); // ERRO!`, output: "Dentro: 100" }
                         ]
                     },
                     {
-                        id: "mod2", title: "Módulo 2: Estruturas de Dados", level: "Intermediário",
+                        id: "mod2", title: "Módulo 2: Estruturas de Dados", level: "Iniciante", status: "aberto",
                         lessons: [
-                            { id: "aula05", title: "05. Funções e Parâmetros", concept: "Funções são blocos reutilizáveis. Arrow functions (<code>=></code>) são mais curtas. Parâmetros padrão evitam erros caso o dado não seja enviado.", exampleTitle: "Calculadora de Dano", exampleDesc: "Criamos uma máquina que multiplica ataque pelo multiplicador crítico. Se o multiplicador não for enviado, assume 1 (dano normal).", code: `const calcDano = (atk, mult = 1) => {\n    return atk * mult;\n};\n\nconsole.log("Normal: " + calcDano(100));\nconsole.log("Crítico: " + calcDano(100, 2.5));`, output: "Normal: 100\nCrítico: 250" },
-                            { id: "aula06", title: "06. Arrays (Listas)", concept: "Listas ordenadas. O índice começa no 0. Métodos essenciais: <code>push</code> (adiciona fim), <code>unshift</code> (início), <code>pop</code> (remove fim), <code>length</code> (tamanho).", exampleTitle: "Mochila do Jogador", exampleDesc: "Começamos com uma mochila. Adicionamos um Rifle no final e uma Poção no início. Por fim, removemos o último item.", code: `const inv = ["Faca", "Pistola"];\ninv.push("Rifle"); // Adiciona no fim\ninv.unshift("Poção"); // Adiciona no início\n\nconsole.log(inv);\nconsole.log("Total: " + inv.length);`, output: "['Poção', 'Faca', 'Pistola', 'Rifle']\nTotal: 4" },
-                            { id: "aula07", title: "07. Objetos (Entidades)", concept: "Agrupam dados no formato chave-valor. Perfeitos para representar fichas de jogador, configurações e respostas de API.", exampleTitle: "Ficha da API", exampleDesc: "O objeto agrupa todas as informações do jogador em uma única variável. Podemos acessar os dados por notação de ponto (perfil.nick).", code: `const perfil = {\n    nick: "Faker",\n    funcao: "Mid",\n    elo: "Desafiante"\n};\n\nconsole.log(\`O \${perfil.nick} joga de \${perfil.funcao}\`);\nconsole.log("Elo: " + perfil.elo);`, output: "O Faker joga de Mid\nElo: Desafiante" }
+                            { id: "aula11", title: "11. Introdução a Arrays", concept: "Arrays são listas ordenadas. O primeiro item fica no índice 0. Usado para retornar listas de usuários, partidas, etc.", exampleTitle: "Lista de Jogadores", exampleDesc: "Acessando o primeiro jogador e o tamanho.", code: `const players = ["Ana", "Bia", "Caio"];\nconsole.log(players[0]);\nconsole.log(players.length);`, output: "Ana\n3" },
+                            { id: "aula12", title: "12. Métodos de Array I", concept: "push adiciona no final, pop remove do final, unshift adiciona no início, shift remove do início. Esses métodos MUTAM o array original.", exampleTitle: "Fila de Atendimento", exampleDesc: "Adicionando e removendo clientes.", code: `const fila = ["A", "B"];\nfila.push("C");\nconsole.log(fila);\nfila.shift();\nconsole.log(fila);`, output: "['A', 'B', 'C']\n['B', 'C']" },
+                            { id: "aula13", title: "13. Métodos de Array II", concept: "slice corta uma parte e cria uma CÓPIA. splice remove/substitui itens do array original.", exampleTitle: "Paginação", exampleDesc: "Cortando partidas para mostrar 2 por página.", code: `const partidas = [1, 2, 3, 4];\nconst pagina1 = partidas.slice(0, 2);\nconsole.log(pagina1);\nconsole.log(partidas);`, output: "[1, 2]\n[1, 2, 3, 4]" },
+                            { id: "aula14", title: "14. Objetos", concept: "Objetos guardam dados no formato chave-valor. Perfeitos para representar entidades do mundo real.", exampleTitle: "Ficha JSON", exampleDesc: "Acessando o elo e o campeão do jogador.", code: `const player = {\n  nome: "Faker",\n  elo: "Desafiante"\n};\nconsole.log(player.elo);`, output: "Desafiante" },
+                            { id: "aula15", title: "15. JSON e Parse", concept: "JSON é o formato de texto universal. JSON.parse() transforma texto em Objeto, JSON.stringify() o contrário.", exampleTitle: "Recebendo API", exampleDesc: "Transformando JSON em objeto JS.", code: `const txt = '{"id": 1, "hp": 100}';\nconst obj = JSON.parse(txt);\nconsole.log(obj.hp);`, output: "100" },
+                            { id: "aula16", title: "16. Map", concept: ".map() percorre o array, aplica uma transformação e retorna um NOVO array. Essencial no React.", exampleTitle: "Extraindo Dados", exampleDesc: "Transformando lista de objetos em lista de strings.", code: `const users = [{name: "A"}, {name: "B"}];\nconst nomes = users.map(u => u.name);\nconsole.log(nomes);`, output: "['A', 'B']" },
+                            { id: "aula17", title: "17. Filter", concept: ".filter() retorna um NOVO array apenas com os itens que passaram no teste (true).", exampleTitle: "Sistema de Banimento", exampleDesc: "Filtrando jogadores com mais de 5 reports.", code: `const p = [{rep: 2}, {rep: 10}, {rep: 6}];\nconst banidos = p.filter(x => x.rep > 5);\nconsole.log(banidos.length);`, output: "2" },
+                            { id: "aula18", title: "18. Reduce", concept: ".reduce() percorre o array acumulando os valores em uma única variável. Usado para somatórios.", exampleTitle: "Total de Dano", exampleDesc: "Somando todo o dano de um time.", code: `const danos = [100, 250, 50];\nconst total = danos.reduce((acc, d) => acc + d, 0);\nconsole.log(total);`, output: "400" },
+                            { id: "aula19", title: "19. Find", concept: ".find() retorna o PRIMEIRO item que passar no teste. Se nenhum passar, retorna undefined.", exampleTitle: "Busca por ID", exampleDesc: "Encontrando o jogador pelo ID único.", code: `const p = [{id: 1}, {id: 2}, {id: 3}];\nconst alvo = p.find(x => x.id === 2);\nconsole.log(alvo);`, output: "{ id: 2 }" },
+                            { id: "aula20", title: "20. Spread Operator", concept: "Os três pontinhos ... copiam os itens de um array/objeto para outro local, evitando mutações acidentais.", exampleTitle: "Juntando Times", exampleDesc: "Criando um novo time sem alterar os originais.", code: `const t1 = ["A"];\nconst t2 = ["B"];\nconst time = [...t1, ...t2];\nconsole.log(time);`, output: "['A', 'B']" }
                         ]
                     },
                     {
-                        id: "mod3", title: "Módulo 3: Lógica Avançada", level: "Avançado",
+                        id: "mod3", title: "Módulo 3: Funções e POO", level: "Intermediário", status: "aberto",
                         lessons: [
-                            { id: "aula08", title: "08. Higher-Order (Map/Filter)", concept: "O padrão da indústria. <code>.filter()</code> cria um novo array apenas com itens aprovados no teste. <code>.map()</code> transforma cada item do array.", exampleTitle: "Auditoria Anticheat", exampleDesc: "Filtramos a lista de jogadores pegando apenas quem tem KDA > 10 (suspeitos). Depois, mapeamos o resultado para extrair apenas os nomes (strings).", code: `const jogadores = [\n    { nome: "Ana", kda: 1.2 },\n    { nome: "Hacker", kda: 15.0 },\n    { nome: "Bia", kda: 3.0 }\n];\n\nconst suspeitos = jogadores.filter(j => j.kda > 10);\nconst nomes = suspeitos.map(j => j.nome);\n\nconsole.log("Banidos: " + nomes);`, output: "Banidos: Hacker" },
-                            { id: "aula09", title: "09. Tratamento de Erros", concept: "Se um erro ocorrer (ex: ler um arquivo inexistente), o sistema não pode quebrar. O bloco <code>try</code> tenta rodar. O <code>catch</code> captura a falha e evita o crash.", exampleTitle: "Save Corrompido", exampleDesc: "Simulamos a leitura de um save do jogo. Se o arquivo estiver corrompido, o código lança um erro e o catch avisa o usuário amigavelmente.", code: `try {\n    // Simulando erro\n    throw new Error("Arquivo corrompido");\n} catch (erro) {\n    console.log("❌ Falha: " + erro.message);\n}`, output: "❌ Falha: Arquivo corrompido" },
-                            { id: "aula10", title: "10. Async / Await (API)", concept: "O JS não espera operações lentas (como internet). O <code>async/await</code> pausa a função até a Promise retornar. Isso evita que a tela do usuário congele.", exampleTitle: "Carregando Perfil", exampleDesc: "Simulamos uma requisição que demora 1 segundo para buscar o status no servidor usando uma Promise e setTimeout.", code: `async function carregar() {\n    console.log("Buscando dados...");\n    const status = await new Promise(r => setTimeout(() => r("Desconectado"), 1000));\n    console.log("Status: " + status);\n}\ncarregar();`, output: "Buscando dados...\n(espera 1s)\nStatus: Desconectado" }
+                            { id: "aula21", title: "21. Funções Clássicas", concept: "Declarações com function sofrem hoisting (podem ser chamadas antes da declaração).", exampleTitle: "Soma", exampleDesc: "Declaração tradicional.", code: `console.log(soma(2, 3));\nfunction soma(a, b) { return a + b; }`, output: "5" },
+                            { id: "aula22", title: "22. Arrow Functions", concept: "Sintaxe curta. Não têm seu próprio this (herdam do contexto pai), evitando bugs em callbacks.", exampleTitle: "Calculo Rápido", exampleDesc: "Função de uma linha.", code: `const dobro = (n) => n * 2;\nconsole.log(dobro(5));`, output: "10" },
+                            { id: "aula23", title: "23. Parâmetros Default", concept: "Define um valor padrão caso o argumento não seja passado. Evita erros de undefined.", exampleTitle: "Dano Base", exampleDesc: "Se o multiplicador não for enviado, assume 1.", code: `const hit = (atk, mult = 1) => atk * mult;\nconsole.log(hit(100));\nconsole.log(hit(100, 2));`, output: "100\n200" },
+                            { id: "aula24", title: "24. Callbacks", concept: "Funções passadas como argumento para outras funções. Executadas 'quando a outra terminar'.", exampleTitle: "Avisando o Front", exampleDesc: "Chamando a função de aviso quando termina.", code: `function aviso(msg) { console.log(msg); }\nfunction carregar(cb) {\n  setTimeout(() => cb("Pronto!"), 1000);\n}\ncarregar(aviso);`, output: "(1s) Pronto!" },
+                            { id: "aula25", title: "25. Closures", concept: "Uma função interna 'lembra' do ambiente onde foi criada. Usado para criar variáveis privadas.", exampleTitle: "Contador Privado", exampleDesc: "A variável count é inacessível de fora.", code: `function contador() {\n  let count = 0;\n  return () => { count++; return count; };\n}\nconst c = contador();\nc(); c();\nconsole.log(c());`, output: "3" },
+                            { id: "aula26", title: "26. Hoisting", concept: "O JS 'lê' o código duas vezes. var e functions são içadas. let e const vão para a Zona Morta (TDZ).", exampleTitle: "Zona Morta", exampleDesc: "let antes de declarar dá erro.", code: `console.log(x);\nvar x = 5;\n// console.log(y);\nlet y = 10;`, output: "undefined" },
+                            { id: "aula27", title: "27. O 'this'", concept: "this aponta para o objeto 'dono' da função. Em arrow functions, é léxico.", exampleTitle: "Objeto e This", exampleDesc: "Acessando this.nome.", code: `const p = {\n  nome: "Ana",\n  falar: function() { console.log(this.nome); }\n};\np.falar();`, output: "Ana" },
+                            { id: "aula28", title: "28. Classes", concept: "Classes são 'moldes' para criar objetos. O constructor roda no momento da criação (new).", exampleTitle: "Fábrica de Jogadores", exampleDesc: "Gerando jogadores com hp inicial.", code: `class Jogador {\n  constructor(n) { this.nome = n; this.hp = 100; }\n}\nconst p1 = new Jogador("Faker");\nconsole.log(p1.hp);`, output: "100" },
+                            { id: "aula29", title: "29. Try/Catch", concept: "Evita que o servidor caia por uma requisição mal formatada. O catch intercepta o erro.", exampleTitle: "Lendo JSON Inválido", exampleDesc: "JSON.parse dá erro, mas o catch captura.", code: `try {\n  JSON.parse("{invalido}");\n} catch (err) {\n  console.log("Deu erro");\n}`, output: "Deu erro" },
+                            { id: "aula30", title: "30. Throw", concept: "Força um erro com throw new Error() quando uma regra de negócio for violada.", exampleTitle: "Bloqueando Login", exampleDesc: "Se a senha for curta, lança erro.", code: `function login(s) {\n  if(s.length < 4) throw new Error("Senha curta");\n  return "Ok";\n}\ntry {\n  login("12");\n} catch(e) {\n  console.log(e.message);\n}`, output: "Senha curta" }
                         ]
                     },
                     {
-                        id: "mod4", title: "Módulo 4: Desafios Backend", level: "Prática",
+                        id: "mod4", title: "Módulo 4: Backend e Assíncrono", level: "Avançado", status: "aberto",
                         lessons: [
-                            { id: "ex01", title: "Desafio 01. Calculadora de KDA", concept: "Crie uma função que calcula o KDA (Kills + Assists / Deaths). Se as mortes forem 0, use Math.max para não dividir por zero.", exampleTitle: "Evitando Infinity", exampleDesc: "Se o jogador não morreu, a divisão por 0 gera Infinity. Usamos Math.max(deaths, 1) para garantir o cálculo seguro.", code: `const calcKDA = (k, a, d) => {\n    return (k + a) / Math.max(d, 1);\n};\nconsole.log(calcKDA(10, 5, 0));`, output: "15" },
-                            { id: "ex02", title: "Desafio 02. Filtro de Banidos", concept: "Use filter para achar jogadores com mais de 5 reports e use map para extrair os IDs deles.", exampleTitle: "Lista de Banimentos", exampleDesc: "O sistema do jogo precisa enviar a lista de IDs para o servidor de banimentos.", code: `const players = [\n  { id: 1, reports: 2 },\n  { id: 2, reports: 8 },\n  { id: 3, reports: 6 }\n];\nconst banidos = players.filter(p => p.reports > 5).map(p => p.id);\nconsole.log(banidos);`, output: "[ 2, 3 ]" },
-                            { id: "ex03", title: "Desafio 03. Maior Kill Streak", concept: "Encontre o maior número em um array de kill streaks usando um loop for.", exampleTitle: "O Recordista", exampleDesc: "Percorremos o array comparando cada número com o maior atual.", code: `const streaks = [3, 7, 2, 15, 8];\nlet maior = 0;\nfor (let s of streaks) {\n  if (s > maior) maior = s;\n}\nconsole.log("Maior streak: " + maior);`, output: "Maior streak: 15" },
-                            { id: "ex04", title: "Desafio 04. Validação de Login", concept: "Use try/catch para garantir que o usuário enviou o email e a senha, senão lance um erro.", exampleTitle: "Segurança Básica", exampleDesc: "Se a API mandar dados vazios, o servidor deve capturar o erro antes de salvar no banco.", code: `function login(email, senha) {\n  if (!email || !senha) throw new Error("Dados incompletos");\n  return "Logado";\n}\ntry {\n  console.log(login("", "123"));\n} catch (e) {\n  console.log(e.message);\n}`, output: "Dados incompletos" },
-                            { id: "ex05", title: "Desafio 05. Async Timeout", concept: "Simule o tempo de resposta de um servidor usando Promise e setTimeout.", exampleTitle: "Ping do Servidor", exampleDesc: "O código espera 2 segundos e depois imprime a latência calculada.", code: `async function ping() {\n  await new Promise(r => setTimeout(r, 2000));\n  console.log("Ping: 15ms");\n}\nping();`, output: "(espera 2s)\nPing: 15ms" }
+                            { id: "aula31", title: "31. Síncrono vs Assíncrono", concept: "JS roda em uma thread. Operações demoradas vão para segundo plano para não travar a tela.", exampleTitle: "A Prova do Event Loop", exampleDesc: "setTimeout joga a tarefa para a fila.", code: `console.log("1");\nsetTimeout(() => console.log("2"), 0);\nconsole.log("3");`, output: "1\n3\n2" },
+                            { id: "aula32", title: "32. Promises", concept: "Objetos que representam o sucesso/falha de uma operação assíncrona. Estados: pending, fulfilled, rejected.", exampleTitle: "A Promessa", exampleDesc: "Promise que resolve após 1s.", code: `const p = new Promise((resolve) => {\n  setTimeout(() => resolve("Dados OK"), 1000);\n});\np.then(msg => console.log(msg));`, output: "(1s) Dados OK" },
+                            { id: "aula33", title: "33. Then / Catch", concept: ".then() roda no sucesso. .catch() captura o erro.", exampleTitle: "Tratando Falha", exampleDesc: "A promise falha e cai no catch.", code: `new Promise((_, reject) => reject("Offline"))\n  .then(d => console.log(d))\n  .catch(e => console.log("Erro: " + e));`, output: "Erro: Offline" },
+                            { id: "aula34", title: "34. Async / Await", concept: "Forma moderna de lidar com Promises. await pausa a função até a Promise resolver, sem travar a thread.", exampleTitle: "Buscando Perfil", exampleDesc: "Código mais limpo.", code: `async function buscar() {\n  const res = await Promise.resolve("Faker");\n  console.log("Nome: " + res);\n}\nbuscar();`, output: "Nome: Faker" },
+                            { id: "aula35", title: "35. Fetch API", concept: "Padrão para requisições HTTP (GET, POST). Retorna uma Promise com a resposta do servidor.", exampleTitle: "Chamando Servidor", exampleDesc: "Simulando chamada de rede.", code: `async function get() { return "Dados da Riot"; }\n(async () => {\n  console.log(await get());\n})();`, output: "Dados da Riot" },
+                            { id: "aula36", title: "36. Event Loop na Prática", concept: "Síncrono roda primeiro. Depois Promises (Microtasks). Depois setTimeout (Macrotasks).", exampleTitle: "A Ordem do Universo", exampleDesc: "Promises rodam antes de setTimeout.", code: `setTimeout(() => console.log("Macro"), 0);\nPromise.resolve().then(() => console.log("Micro"));\nconsole.log("Sync");`, output: "Sync\nMicro\nMacro" },
+                            { id: "aula37", title: "37. SetInterval", concept: "Roda uma função repetidamente. O clearInterval() é crucial para parar o timer.", exampleTitle: "Timer de Partida", exampleDesc: "Contando até 3 e parando.", code: `let i = 0;\nconst id = setInterval(() => {\n  i++; console.log(i);\n  if(i === 3) clearInterval(id);\n}, 1000);`, output: "1\n2\n3" },
+                            { id: "aula38", title: "38. LocalStorage", concept: "API do navegador para salvar dados persistentes (strings). Não existe no Node.js.", exampleTitle: "Salvando o Tema", exampleDesc: "Salvando e lendo.", code: `localStorage.setItem("tema", "dark");\nconst tema = localStorage.getItem("tema");\nconsole.log(tema);`, output: "dark" },
+                            { id: "aula39", title: "39. Manipulação de DOM", concept: "Alterar a estrutura do HTML via JS (textos, cores, elementos).", exampleTitle: "Alterando o Título", exampleDesc: "Mudando o conteúdo pelo ID.", code: `// document.getElementById("titulo").innerText = "Novo";\nconsole.log("DOM alterado");`, output: "DOM alterado" },
+                            { id: "aula40", title: "40. Eventos", concept: "Ações do usuário (cliques, digitação). Usamos addEventListener para ouvir e executar funções.", exampleTitle: "Botão de Iniciar", exampleDesc: "Listener no botão.", code: `// btn.addEventListener("click", () => alert("Iniciou!"));\nconsole.log("Evento disparado");`, output: "Evento disparado" }
+                        ]
+                    },
+                    {
+                        id: "mod5", title: "Módulo 5: Desafios Práticos", level: "Prática", status: "aberto",
+                        lessons: [
+                            { id: "ex01", title: "Desafio 01. Calculadora de KDA", concept: "Crie uma função que calcula o KDA. Se as mortes forem 0, use Math.max para não dividir por zero.", exampleTitle: "Evitando Infinity", exampleDesc: "Math.max(deaths, 1) garante o cálculo seguro.", code: `const calcKDA = (k, a, d) => {\n    return (k + a) / Math.max(d, 1);\n};\nconsole.log(calcKDA(10, 5, 0));`, output: "15" },
+                            { id: "ex02", title: "Desafio 02. Filtro de Banidos", concept: "Use filter para achar jogadores com mais de 5 reports e map para extrair os IDs.", exampleTitle: "Lista de Banimentos", exampleDesc: "Filtrando e mapeando.", code: `const players = [{ id: 1, reports: 2 }, { id: 2, reports: 8 }];\nconst banidos = players.filter(p => p.reports > 5).map(p => p.id);\nconsole.log(banidos);`, output: "[ 2 ]" },
+                            { id: "ex03", title: "Desafio 03. Maior Kill Streak", concept: "Encontre o maior número em um array de kill streaks.", exampleTitle: "O Recordista", exampleDesc: "Percorrendo o array.", code: `const streaks = [3, 7, 2, 15, 8];\nlet maior = 0;\nfor (let s of streaks) {\n  if (s > maior) maior = s;\n}\nconsole.log("Maior: " + maior);`, output: "Maior: 15" },
+                            { id: "ex04", title: "Desafio 04. Validação de Login", concept: "Use try/catch para garantir que o usuário enviou email e senha.", exampleTitle: "Segurança", exampleDesc: "Lançando erro se faltar dados.", code: `function login(e, s) {\n  if (!e || !s) throw new Error("Incompleto");\n  return "Logado";\n}\ntry {\n  console.log(login("", "123"));\n} catch (e) {\n  console.log(e.message);\n}`, output: "Incompleto" },
+                            { id: "ex05", title: "Desafio 05. Async Timeout", concept: "Simule tempo de resposta de servidor com Promise e setTimeout.", exampleTitle: "Ping", exampleDesc: "Esperando 1 segundo.", code: `async function ping() {\n  await new Promise(r => setTimeout(r, 1000));\n  console.log("Ping: 15ms");\n}\nping();`, output: "(espera 1s)\nPing: 15ms" }
                         ]
                     }
                 ]
@@ -514,10 +564,10 @@
             showToast: (msg, type) => Toast.show(msg, type),
             init: () => {
                 const session = DataManager.getSession();
-                if(session) { UI.renderUser(); UI.showHub(); } 
-                else {
+                if(session) { 
+                    UI.showWelcome(); 
+                } else {
                     document.getElementById('login-modal').classList.add('active');
-                    document.getElementById('user-profile').innerHTML = `<button class="btn-primary" onclick="document.getElementById('login-modal').classList.add('active')">Fazer Login</button>`;
                 }
             },
             renderUser: () => {
@@ -526,6 +576,8 @@
                 const user = DataManager.getUsers()[session.username];
                 const xp = user.xp || 0; const streak = user.streak || 0;
                 const level = Math.floor(xp / 200) + 1;
+                
+                // Atualiza o perfil da sidebar (só é chamado dentro da track)
                 document.getElementById('user-profile').innerHTML = `
                     <div class="user-stats">
                         <div class="stat-item"><div class="stat-value">${level}</div><div class="stat-label">Nível</div></div>
@@ -543,12 +595,19 @@
                 document.getElementById('profile-level-display').innerText = `Nível ${level} • ${user.xp || 0} XP`;
                 document.getElementById('profile-modal').classList.add('active');
             },
-            showHub: () => {
-                document.body.className = 'in-hub';
-                document.getElementById('hub-screen').style.display = 'block';
+            showWelcome: () => {
+                document.body.className = 'in-welcome';
+                document.getElementById('welcome-screen').style.display = 'flex';
+                document.getElementById('hub-screen').style.display = 'none';
                 document.getElementById('encyclopedia-screen').style.display = 'none';
                 document.getElementById('lesson-screen').style.display = 'none';
-                document.getElementById('nav-menu').innerHTML = '<div style="padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Escolha uma trilha ao lado</div>';
+            },
+            showHub: () => {
+                document.body.className = 'in-hub';
+                document.getElementById('welcome-screen').style.display = 'none';
+                document.getElementById('hub-screen').style.display = 'flex'; // Flex para centralizar
+                document.getElementById('encyclopedia-screen').style.display = 'none';
+                document.getElementById('lesson-screen').style.display = 'none';
                 UI.renderTracks();
             },
             showEncyclopedia: () => {
@@ -582,10 +641,14 @@
             },
             selectTrack: (track) => {
                 currentTrack = track; document.body.className = 'in-track';
+                document.getElementById('welcome-screen').style.display = 'none';
                 document.getElementById('hub-screen').style.display = 'none';
                 document.getElementById('encyclopedia-screen').style.display = 'none';
                 document.getElementById('lesson-screen').style.display = 'block';
+                
+                UI.renderUser(); // Renderiza o perfil na sidebar
                 UI.renderSidebar(track);
+                
                 const firstMod = track.modules[0];
                 if (firstMod && firstMod.lessons.length > 0) UI.loadLesson(firstMod.lessons[0], firstMod.id);
             },
@@ -594,17 +657,27 @@
                 const session = DataManager.getSession();
                 const progress = session ? DataManager.getUsers()[session.username].progress : [];
                 track.modules.forEach(mod => {
-                    const titleEl = document.createElement('div'); titleEl.className = 'module-title'; titleEl.innerText = mod.title;
+                    const titleEl = document.createElement('div'); 
+                    titleEl.className = 'module-title'; 
+                    titleEl.innerHTML = `${mod.title} <span class="badge">${mod.level}</span>`;
                     nav.appendChild(titleEl);
-                    mod.lessons.forEach(lesson => {
-                        const isDone = progress.includes(lesson.id);
-                        const isActive = currentLesson && currentLesson.id === lesson.id;
-                        const el = document.createElement('div');
-                        el.className = `nav-item ${isDone ? 'completed' : ''} ${isActive ? 'active' : ''}`;
-                        el.innerHTML = `<span class="icon">${isDone ? '✅' : '📄'}</span> ${lesson.title}`;
-                        el.onclick = () => UI.loadLesson(lesson, mod.id);
-                        nav.appendChild(el);
-                    });
+
+                    if(mod.status === 'bloqueado') {
+                        const lockEl = document.createElement('div');
+                        lockEl.className = 'nav-item locked';
+                        lockEl.innerHTML = `<span class="icon">🔒</span> Em breve (Lançamento)`;
+                        nav.appendChild(lockEl);
+                    } else {
+                        mod.lessons.forEach(lesson => {
+                            const isDone = progress.includes(lesson.id);
+                            const isActive = currentLesson && currentLesson.id === lesson.id;
+                            const el = document.createElement('div');
+                            el.className = `nav-item ${isDone ? 'completed' : ''} ${isActive ? 'active' : ''}`;
+                            el.innerHTML = `<span class="icon">${isDone ? '✅' : '📄'}</span> ${lesson.title}`;
+                            el.onclick = () => UI.loadLesson(lesson, mod.id);
+                            nav.appendChild(el);
+                        });
+                    }
                 });
             },
             filterLessons: (query) => {
@@ -619,6 +692,7 @@
                 const isStarred = user.bookmarks.includes(lesson.id);
                 const note = user.notes[lesson.id] || '';
                 const screen = document.getElementById('lesson-screen');
+                
                 screen.innerHTML = `
                     <div class="lesson-topbar">
                         <span class="badge">${currentTrack.title}</span>
@@ -649,7 +723,9 @@
                     </div>
                     <div class="info-card"><h3>📝 Suas Anotações</h3><textarea class="notes-area" id="lesson-notes" onblur="UI.saveNote('${lesson.id}')" placeholder="Anote suas dúvidas...">${note}</textarea></div>
                 `;
-                Playground.init(lesson.code);
+                
+                setTimeout(() => { Playground.init(lesson.code); }, 50);
+
                 const totalLessons = currentTrack.modules.flatMap(m => m.lessons).length;
                 const completed = currentTrack.modules.flatMap(m => m.lessons).filter(l => user.progress.includes(l.id)).length;
                 if(totalLessons > 0 && completed === totalLessons) setTimeout(() => UI.generateCert(), 500);
@@ -698,19 +774,27 @@
         const Playground = {
             editor: null,
             init: (code) => {
-                require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs' }});
-                require(['vs/editor/editor.main'], function() {
-                    if(Playground.editor) Playground.editor.dispose();
-                    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-                    Playground.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
-                        value: code, language: 'javascript', theme: isLight ? 'vs' : 'vs-dark',
-                        minimap: { enabled: false }, fontSize: 13, fontFamily: 'JetBrains Mono',
-                        automaticLayout: true, // RESOLVE O PROBLEMA DO SCROLLBAR DE TAMANHO
-                        scrollBeyondLastLine: false
+                const container = document.getElementById('monaco-editor');
+                if(!container) return;
+                
+                try {
+                    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs' }});
+                    require(['vs/editor/editor.main'], function() {
+                        if(Playground.editor) Playground.editor.dispose();
+                        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+                        Playground.editor = monaco.editor.create(container, {
+                            value: code, language: 'javascript', theme: isLight ? 'vs' : 'vs-dark',
+                            minimap: { enabled: false }, fontSize: 13, fontFamily: 'JetBrains Mono',
+                            automaticLayout: true,
+                            scrollBeyondLastLine: false
+                        });
                     });
-                });
+                } catch(e) {
+                    container.innerHTML = `<pre style="color:#fff; padding:10px; font-family:monospace; font-size:12px;">${code}</pre>`;
+                }
             },
             run: () => {
+                if(!Playground.editor) return;
                 const code = Playground.editor.getValue(); const outputDiv = document.getElementById('console-output'); outputDiv.innerHTML = '';
                 const originalLog = console.log;
                 console.log = (...args) => { outputDiv.innerHTML += args.join(' ') + '<br>'; originalLog(...args); };
