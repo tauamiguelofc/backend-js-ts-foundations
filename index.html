@@ -194,7 +194,7 @@
 
     <div id="toast-container"></div>
 
-    <!-- TOP NAVBAR (SÓ APARECE NAS TELAS INICIAIS) -->
+    <!-- TOP NAVBAR -->
     <header class="top-navbar">
         <div class="brand">
             <div class="brand-icon"><img src="jsbase.gif" alt="Logo"></div>
@@ -208,7 +208,7 @@
     </header>
 
     <div class="app-body">
-        <!-- SIDEBAR (SÓ APARECE NA TRILHA) -->
+        <!-- SIDEBAR -->
         <aside class="sidebar" id="main-sidebar">
             <div class="sidebar-header">
                 <div class="brand">
@@ -292,7 +292,8 @@
         </main>
     </div>
 
-    <!-- MODAL LOGIN -->
+    <!-- MODAIS -->
+    <!-- LOGIN -->
     <div class="modal-overlay" id="login-modal">
         <div class="modal">
             <h2 style="text-align: center; margin-bottom: 1.5rem; font-size:1.2rem;">Acessar Plataforma</h2>
@@ -305,7 +306,7 @@
         </div>
     </div>
 
-    <!-- MODAL PERFIL -->
+    <!-- PERFIL -->
     <div class="modal-overlay" id="profile-modal">
         <div class="modal">
             <button class="btn-close" onclick="document.getElementById('profile-modal').classList.remove('active')">✕</button>
@@ -324,7 +325,7 @@
         </div>
     </div>
 
-    <!-- MODAL DOAÇÃO -->
+    <!-- DOAÇÃO -->
     <div class="modal-overlay" id="donate-modal">
         <div class="modal">
             <button class="btn-close" onclick="document.getElementById('donate-modal').classList.remove('active')">✕</button>
@@ -350,7 +351,7 @@
         </div>
     </div>
 
-    <!-- MODAL CERTIFICADO -->
+    <!-- CERTIFICADO -->
     <div class="modal-overlay" id="cert-modal">
         <div class="modal">
             <button class="btn-close" onclick="document.getElementById('cert-modal').classList.remove('active')">✕</button>
@@ -363,7 +364,7 @@
 
     <script>
         // =====================================================================
-        // 📚 BANCO DE DADOS COMPLETO (45 AULAS RESTAURADAS)
+        // 📚 BANCO DE DADOS COMPLETO (45 AULAS)
         // =====================================================================
         const Tracks = [
             {
@@ -377,66 +378,66 @@
                         id: "mod1", title: "Módulo 1: Fundamentos da Linguagem", level: "Básico", status: "aberto",
                         lessons: [
                             { id: "aula01", title: "01. Variáveis e Escopo", concept: "Variáveis são a base de qualquer software. No JS moderno, usamos <code>const</code> por padrão, pois ele impede a reatribuição acidental. O <code>let</code> é usado apenas quando o valor precisa mudar. A keyword <code>var</code> foi banida das boas práticas pois não respeita escopo de bloco.", exampleTitle: "O Bug do Vazamento de Escopo", exampleDesc: "Se usarmos var dentro de um if, a variável vaza e pode sobrescrever dados fora do bloco. Com let e const, o JS isola o escopo e protege a memória.", code: `const nomeJogador = "Faker";\nlet hpAtual = 100;\nhpAtual = hpAtual - 30;\nconsole.log(\`Jogador: \${nomeJogador}\`);\nconsole.log(\`HP Restante: \${hpAtual}\`);`, output: "Jogador: Faker\nHP Restante: 70" },
-                            { id: "aula02", title: "02. Tipagem e Conversão", concept: "JavaScript é de tipagem fraca. Se você somar um texto (string) com um número, ele vai juntar os dois (concatenar). Para evitar bugs graves em produção, usamos Number() ou parseInt() para converter dados de APIs.", exampleTitle: "O Bug de Dano '5020'", exampleDesc: "A API envia o ataque como string '50'. Se você somar com a defesa 20, o jogador levará '5020' de dano. O código abaixo converte e evita a tragédia.", code: `const danoString = "50";\nconst defesa = 20;\nconsole.log("Erro: " + (danoString + defesa));\nconst danoReal = Number(danoString) + defesa;\nconsole.log("Dano Real: " + danoReal);`, output: "Erro: 5020\nDano Real: 70" },
-                            { id: "aula03", title: "03. Operadores Aritméticos", concept: "A matemática no código segue a mesma ordem da escola (PEMDAS). O operador % (módulo) retorna o resto da divisão e é muito usado para descobrir se um número é par, ímpar ou múltiplo.", exampleTitle: "Cálculo de Dano Crítico", exampleDesc: "O dano crítico é calculado multiplicando o ataque base pelo multiplicador e somando bônus aditivos.", code: `const ataque = 100;\nconst multCritico = 2.5;\nconst bonus = 50;\nconst danoFinal = (ataque * multCritico) + bonus;\nconsole.log("Dano Final: " + danoFinal);\nconsole.log("10 é par? " + (10 % 2 === 0));`, output: "Dano Final: 300\n10 é par? true" },
-                            { id: "aula04", title: "04. Operadores Lógicos", concept: "Os operadores lógicos && (E) e || (OU) são a base da tomada de decisão. O && só retorna true se ambos forem verdadeiros. O || retorna true se pelo menos um for. Usamos também o ! (NOT) para inverter.", exampleTitle: "Sistema de Matchmaking", exampleDesc: "Para entrar na fila do ranqueado, o jogador precisa ter Nível >= 10 E ter o jogo original. Se ele for banido (!banido), ele não entra.", code: `const nivel = 15;\nconst temJogo = true;\nconst estaBanido = false;\nif (nivel >= 10 && temJogo && !estaBanido) {\n    console.log("✅ Entrando na fila...");\n}`, output: "✅ Entrando na fila..." },
-                            { id: "aula05", title: "05. Condicionais (If/Else)", concept: "O controle de fluxo permite que o código tome caminhos diferentes. O if verifica uma condição. O else if adiciona mais verificações e o else captura tudo que não passou.", exampleTitle: "Rankeamento de Notas", exampleDesc: "Se o KDA for acima de 10 é MVP. Se for maior que 5 é Bom. Se não passar, cai no else.", code: `const kda = 8.5;\nif (kda >= 10) {\n    console.log("MVP");\n} else if (kda >= 5) {\n    console.log("Bom Jogador");\n} else {\n    console.log("Precisa treinar");\n}`, output: "Bom Jogador" },
-                            { id: "aula06", title: "06. Switch Case", concept: "Quando você tem uma variável que pode assumir vários valores exatos, o switch é mais limpo que uma cadeia de if/else. O break é obrigatório para parar a execução.", exampleTitle: "Escolha de Classe", exampleDesc: "O jogador aperta 1 para Guerreiro ou 2 para Mago.", code: `const escolha = 2;\nswitch (escolha) {\n    case 1: console.log("Guerreiro"); break;\n    case 2: console.log("Mago"); break;\n    default: console.log("Desconhecido");\n}`, output: "Mago" },
-                            { id: "aula07", title: "07. Loops (For)", concept: "O laço for é usado quando você sabe exatamente o número de iterações. Ele possui inicialização, condição e incremento.", exampleTitle: "Spawn de Inimigos", exampleDesc: "Gerar 5 inimigos no mapa no início da rodada.", code: `for (let i = 1; i <= 5; i++) {\n    console.log("Inimigo " + i + " spawnado!");\n}`, output: "Inimigo 1 spawnado!\n...\nInimigo 5 spawnado!" },
-                            { id: "aula08", title: "08. Loops (While)", concept: "O while é usado quando você NÃO sabe quantas vezes o código vai rodar, mas sabe a condição de parada. Se a condição for sempre verdadeira, ocorre um loop infinito.", exampleTitle: "Jogando enquanto Vivo", exampleDesc: "O jogo continua enquanto a vida for maior que zero.", code: `let vida = 3;\nwhile (vida > 0) {\n    console.log("Jogando... Restam " + vida + " vidas");\n    vida--;\n}\nconsole.log("GAME OVER");`, output: "Jogando... Restam 3 vidas\nJogando... Restam 2 vidas\nJogando... Restam 1 vidas\nGAME OVER" },
-                            { id: "aula09", title: "09. Break e Continue", concept: "O break encerra o loop inteiro. O continue pula a iteração atual sem executar o resto do código daquela rodada.", exampleTitle: "Pulando o Chefe", exampleDesc: "Se o inimigo for 2, pula. Se for 4, para o loop.", code: `for (let i = 1; i <= 5; i++) {\n    if (i === 2) continue;\n    if (i === 4) break;\n    console.log("Atacando " + i);\n}`, output: "Atacando 1\nAtacando 3" },
-                            { id: "aula10", title: "10. Escopo de Bloco", concept: "Variáveis declaradas com let e const dentro de chaves { } morrem quando o bloco termina. Isso protege o sistema.", exampleTitle: "Segredo do If", exampleDesc: "Uma variável criada dentro de um if não existe fora dele.", code: `if (true) {\n    let vidaSecreta = 100;\n    console.log("Dentro: " + vidaSecreta);\n}\n// console.log(vidaSecreta); // ERRO!`, output: "Dentro: 100" }
+                            { id: "aula02", title: "02. Tipagem e Conversão", concept: "JavaScript é de tipagem fraca. Se você somar um texto (string) com um número, ele vai juntar os dois. Para evitar bugs, usamos Number() para converter dados de APIs.", exampleTitle: "O Bug de Dano '5020'", exampleDesc: "A API envia o ataque como string '50'. Se somar com a defesa 20, o jogador leva '5020' de dano.", code: `const danoString = "50";\nconst defesa = 20;\nconsole.log("Erro: " + (danoString + defesa));\nconst danoReal = Number(danoString) + defesa;\nconsole.log("Dano Real: " + danoReal);`, output: "Erro: 5020\nDano Real: 70" },
+                            { id: "aula03", title: "03. Operadores Aritméticos", concept: "A matemática no código segue a ordem da escola (PEMDAS). O operador % (módulo) retorna o resto da divisão e é muito usado para descobrir se um número é par.", exampleTitle: "Cálculo de Dano Crítico", exampleDesc: "O dano crítico é calculado multiplicando o ataque base pelo multiplicador e somando bônus.", code: `const ataque = 100;\nconst multCritico = 2.5;\nconst bonus = 50;\nconst danoFinal = (ataque * multCritico) + bonus;\nconsole.log("Dano Final: " + danoFinal);\nconsole.log("10 é par? " + (10 % 2 === 0));`, output: "Dano Final: 300\n10 é par? true" },
+                            { id: "aula04", title: "04. Operadores Lógicos", concept: "Os operadores && (E) e || (OU) são a base da decisão. O && só retorna true se ambos forem verdadeiros. O || retorna true se um for.", exampleTitle: "Sistema de Matchmaking", exampleDesc: "Para entrar na ranqueada, precisa ter Nível >= 10 E ter o jogo original. Se banido (!banido), não entra.", code: `const nivel = 15;\nconst temJogo = true;\nconst estaBanido = false;\nif (nivel >= 10 && temJogo && !estaBanido) {\n    console.log("✅ Entrando na fila...");\n}`, output: "✅ Entrando na fila..." },
+                            { id: "aula05", title: "05. Condicionais (If/Else)", concept: "O if verifica uma condição. O else if adiciona mais verificações e o else captura tudo que não passou.", exampleTitle: "Rankeamento de Notas", exampleDesc: "Se o KDA for acima de 10 é MVP. Se for maior que 5 é Bom. Se não, precisa treinar.", code: `const kda = 8.5;\nif (kda >= 10) {\n    console.log("MVP");\n} else if (kda >= 5) {\n    console.log("Bom Jogador");\n} else {\n    console.log("Precisa treinar");\n}`, output: "Bom Jogador" },
+                            { id: "aula06", title: "06. Switch Case", concept: "Quando uma variável pode assumir vários valores exatos, o switch é mais limpo. O break para a execução.", exampleTitle: "Escolha de Classe", exampleDesc: "Aperta 1 para Guerreiro ou 2 para Mago.", code: `const escolha = 2;\nswitch (escolha) {\n    case 1: console.log("Guerreiro"); break;\n    case 2: console.log("Mago"); break;\n    default: console.log("Desconhecido");\n}`, output: "Mago" },
+                            { id: "aula07", title: "07. Loops (For)", concept: "O for é usado quando você sabe exatamente o número de iterações. Inicialização, condição e incremento.", exampleTitle: "Spawn de Inimigos", exampleDesc: "Gerar 5 inimigos no mapa.", code: `for (let i = 1; i <= 5; i++) {\n    console.log("Inimigo " + i + " spawnado!");\n}`, output: "Inimigo 1 spawnado!\n...\nInimigo 5 spawnado!" },
+                            { id: "aula08", title: "08. Loops (While)", concept: "O while é usado quando não se sabe quantas vezes vai rodar, mas sabe a condição de parada.", exampleTitle: "Jogando enquanto Vivo", exampleDesc: "O jogo continua enquanto a vida for maior que zero.", code: `let vida = 3;\nwhile (vida > 0) {\n    console.log("Jogando... Restam " + vida + " vidas");\n    vida--;\n}\nconsole.log("GAME OVER");`, output: "Jogando... Restam 3 vidas\nJogando... Restam 2 vidas\nJogando... Restam 1 vidas\nGAME OVER" },
+                            { id: "aula09", title: "09. Break e Continue", concept: "O break encerra o loop inteiro. O continue pula a iteração atual.", exampleTitle: "Pulando o Chefe", exampleDesc: "Se o inimigo for 2, pula. Se for 4, para.", code: `for (let i = 1; i <= 5; i++) {\n    if (i === 2) continue;\n    if (i === 4) break;\n    console.log("Atacando " + i);\n}`, output: "Atacando 1\nAtacando 3" },
+                            { id: "aula10", title: "10. Escopo de Bloco", concept: "Variáveis let e const dentro de chaves { } morrem quando o bloco termina.", exampleTitle: "Segredo do If", exampleDesc: "A variável criada dentro do if não existe fora.", code: `if (true) {\n    let vidaSecreta = 100;\n    console.log("Dentro: " + vidaSecreta);\n}\n// console.log(vidaSecreta); // ERRO!`, output: "Dentro: 100" }
                         ]
                     },
                     {
                         id: "mod2", title: "Módulo 2: Estruturas de Dados", level: "Iniciante", status: "aberto",
                         lessons: [
-                            { id: "aula11", title: "11. Introdução a Arrays", concept: "Arrays são listas ordenadas. O primeiro item fica no índice 0. Usado para retornar listas de usuários, partidas, etc.", exampleTitle: "Lista de Jogadores", exampleDesc: "Acessando o primeiro jogador e o tamanho.", code: `const players = ["Ana", "Bia", "Caio"];\nconsole.log(players[0]);\nconsole.log(players.length);`, output: "Ana\n3" },
-                            { id: "aula12", title: "12. Métodos de Array I", concept: "push adiciona no final, pop remove do final, unshift adiciona no início, shift remove do início. Esses métodos MUTAM o array original.", exampleTitle: "Fila de Atendimento", exampleDesc: "Adicionando e removendo clientes.", code: `const fila = ["A", "B"];\nfila.push("C");\nconsole.log(fila);\nfila.shift();\nconsole.log(fila);`, output: "['A', 'B', 'C']\n['B', 'C']" },
-                            { id: "aula13", title: "13. Métodos de Array II", concept: "slice corta uma parte e cria uma CÓPIA. splice remove/substitui itens do array original.", exampleTitle: "Paginação", exampleDesc: "Cortando partidas para mostrar 2 por página.", code: `const partidas = [1, 2, 3, 4];\nconst pagina1 = partidas.slice(0, 2);\nconsole.log(pagina1);\nconsole.log(partidas);`, output: "[1, 2]\n[1, 2, 3, 4]" },
-                            { id: "aula14", title: "14. Objetos", concept: "Objetos guardam dados no formato chave-valor. Perfeitos para representar entidades do mundo real.", exampleTitle: "Ficha JSON", exampleDesc: "Acessando o elo e o campeão do jogador.", code: `const player = {\n  nome: "Faker",\n  elo: "Desafiante"\n};\nconsole.log(player.elo);`, output: "Desafiante" },
-                            { id: "aula15", title: "15. JSON e Parse", concept: "JSON é o formato de texto universal. JSON.parse() transforma texto em Objeto, JSON.stringify() o contrário.", exampleTitle: "Recebendo API", exampleDesc: "Transformando JSON em objeto JS.", code: `const txt = '{"id": 1, "hp": 100}';\nconst obj = JSON.parse(txt);\nconsole.log(obj.hp);`, output: "100" },
-                            { id: "aula16", title: "16. Map", concept: ".map() percorre o array, aplica uma transformação e retorna um NOVO array. Essencial no React.", exampleTitle: "Extraindo Dados", exampleDesc: "Transformando lista de objetos em lista de strings.", code: `const users = [{name: "A"}, {name: "B"}];\nconst nomes = users.map(u => u.name);\nconsole.log(nomes);`, output: "['A', 'B']" },
-                            { id: "aula17", title: "17. Filter", concept: ".filter() retorna um NOVO array apenas com os itens que passaram no teste (true).", exampleTitle: "Sistema de Banimento", exampleDesc: "Filtrando jogadores com mais de 5 reports.", code: `const p = [{rep: 2}, {rep: 10}, {rep: 6}];\nconst banidos = p.filter(x => x.rep > 5);\nconsole.log(banidos.length);`, output: "2" },
-                            { id: "aula18", title: "18. Reduce", concept: ".reduce() percorre o array acumulando os valores em uma única variável. Usado para somatórios.", exampleTitle: "Total de Dano", exampleDesc: "Somando todo o dano de um time.", code: `const danos = [100, 250, 50];\nconst total = danos.reduce((acc, d) => acc + d, 0);\nconsole.log(total);`, output: "400" },
-                            { id: "aula19", title: "19. Find", concept: ".find() retorna o PRIMEIRO item que passar no teste. Se nenhum passar, retorna undefined.", exampleTitle: "Busca por ID", exampleDesc: "Encontrando o jogador pelo ID único.", code: `const p = [{id: 1}, {id: 2}, {id: 3}];\nconst alvo = p.find(x => x.id === 2);\nconsole.log(alvo);`, output: "{ id: 2 }" },
-                            { id: "aula20", title: "20. Spread Operator", concept: "Os três pontinhos ... copiam os itens de um array/objeto para outro local, evitando mutações acidentais.", exampleTitle: "Juntando Times", exampleDesc: "Criando um novo time sem alterar os originais.", code: `const t1 = ["A"];\nconst t2 = ["B"];\nconst time = [...t1, ...t2];\nconsole.log(time);`, output: "['A', 'B']" }
+                            { id: "aula11", title: "11. Introdução a Arrays", concept: "Listas ordenadas. O primeiro item fica no índice 0.", exampleTitle: "Lista de Jogadores", exampleDesc: "Acessando o primeiro jogador e o tamanho.", code: `const players = ["Ana", "Bia", "Caio"];\nconsole.log(players[0]);\nconsole.log(players.length);`, output: "Ana\n3" },
+                            { id: "aula12", title: "12. Métodos de Array I", concept: "push adiciona no final, pop remove do final, unshift adiciona no início, shift remove do início.", exampleTitle: "Fila de Atendimento", exampleDesc: "Adicionando e removendo clientes.", code: `const fila = ["A", "B"];\nfila.push("C");\nconsole.log(fila);\nfila.shift();\nconsole.log(fila);`, output: "['A', 'B', 'C']\n['B', 'C']" },
+                            { id: "aula13", title: "13. Métodos de Array II", concept: "slice cria uma CÓPIA. splice remove/substitui do original.", exampleTitle: "Paginação", exampleDesc: "Cortando partidas para mostrar 2 por página.", code: `const partidas = [1, 2, 3, 4];\nconst pagina1 = partidas.slice(0, 2);\nconsole.log(pagina1);\nconsole.log(partidas);`, output: "[1, 2]\n[1, 2, 3, 4]" },
+                            { id: "aula14", title: "14. Objetos", concept: "Formato chave-valor. Perfeitos para representar entidades.", exampleTitle: "Ficha JSON", exampleDesc: "Acessando o elo do jogador.", code: `const player = {\n  nome: "Faker",\n  elo: "Desafiante"\n};\nconsole.log(player.elo);`, output: "Desafiante" },
+                            { id: "aula15", title: "15. JSON e Parse", concept: "Formato de texto universal. JSON.parse() transforma em objeto.", exampleTitle: "Recebendo API", exampleDesc: "Transformando JSON em objeto JS.", code: `const txt = '{"id": 1, "hp": 100}';\nconst obj = JSON.parse(txt);\nconsole.log(obj.hp);`, output: "100" },
+                            { id: "aula16", title: "16. Map", concept: ".map() percorre o array, aplica uma transformação e retorna um NOVO array.", exampleTitle: "Extraindo Dados", exampleDesc: "Transformando lista de objetos em lista de strings.", code: `const users = [{name: "A"}, {name: "B"}];\nconst nomes = users.map(u => u.name);\nconsole.log(nomes);`, output: "['A', 'B']" },
+                            { id: "aula17", title: "17. Filter", concept: ".filter() retorna um NOVO array apenas com os itens que passaram no teste.", exampleTitle: "Sistema de Banimento", exampleDesc: "Filtrando jogadores com mais de 5 reports.", code: `const p = [{rep: 2}, {rep: 10}, {rep: 6}];\nconst banidos = p.filter(x => x.rep > 5);\nconsole.log(banidos.length);`, output: "2" },
+                            { id: "aula18", title: "18. Reduce", concept: ".reduce() acumula os valores em uma única variável.", exampleTitle: "Total de Dano", exampleDesc: "Somando todo o dano de um time.", code: `const danos = [100, 250, 50];\nconst total = danos.reduce((acc, d) => acc + d, 0);\nconsole.log(total);`, output: "400" },
+                            { id: "aula19", title: "19. Find", concept: ".find() retorna o PRIMEIRO item que passar no teste.", exampleTitle: "Busca por ID", exampleDesc: "Encontrando o jogador pelo ID.", code: `const p = [{id: 1}, {id: 2}, {id: 3}];\nconst alvo = p.find(x => x.id === 2);\nconsole.log(alvo);`, output: "{ id: 2 }" },
+                            { id: "aula20", title: "20. Spread Operator", concept: "Os três pontinhos ... copiam itens de um array/objeto para outro local.", exampleTitle: "Juntando Times", exampleDesc: "Criando um novo time sem alterar os originais.", code: `const t1 = ["A"];\nconst t2 = ["B"];\nconst time = [...t1, ...t2];\nconsole.log(time);`, output: "['A', 'B']" }
                         ]
                     },
                     {
                         id: "mod3", title: "Módulo 3: Funções e POO", level: "Intermediário", status: "aberto",
                         lessons: [
-                            { id: "aula21", title: "21. Funções Clássicas", concept: "Declarações com function sofrem hoisting (podem ser chamadas antes da declaração).", exampleTitle: "Soma", exampleDesc: "Declaração tradicional.", code: `console.log(soma(2, 3));\nfunction soma(a, b) { return a + b; }`, output: "5" },
-                            { id: "aula22", title: "22. Arrow Functions", concept: "Sintaxe curta. Não têm seu próprio this (herdam do contexto pai), evitando bugs em callbacks.", exampleTitle: "Calculo Rápido", exampleDesc: "Função de uma linha.", code: `const dobro = (n) => n * 2;\nconsole.log(dobro(5));`, output: "10" },
-                            { id: "aula23", title: "23. Parâmetros Default", concept: "Define um valor padrão caso o argumento não seja passado. Evita erros de undefined.", exampleTitle: "Dano Base", exampleDesc: "Se o multiplicador não for enviado, assume 1.", code: `const hit = (atk, mult = 1) => atk * mult;\nconsole.log(hit(100));\nconsole.log(hit(100, 2));`, output: "100\n200" },
-                            { id: "aula24", title: "24. Callbacks", concept: "Funções passadas como argumento para outras funções. Executadas 'quando a outra terminar'.", exampleTitle: "Avisando o Front", exampleDesc: "Chamando a função de aviso quando termina.", code: `function aviso(msg) { console.log(msg); }\nfunction carregar(cb) {\n  setTimeout(() => cb("Pronto!"), 1000);\n}\ncarregar(aviso);`, output: "(1s) Pronto!" },
-                            { id: "aula25", title: "25. Closures", concept: "Uma função interna 'lembra' do ambiente onde foi criada. Usado para criar variáveis privadas.", exampleTitle: "Contador Privado", exampleDesc: "A variável count é inacessível de fora.", code: `function contador() {\n  let count = 0;\n  return () => { count++; return count; };\n}\nconst c = contador();\nc(); c();\nconsole.log(c());`, output: "3" },
-                            { id: "aula26", title: "26. Hoisting", concept: "O JS 'lê' o código duas vezes. var e functions são içadas. let e const vão para a Zona Morta (TDZ).", exampleTitle: "Zona Morta", exampleDesc: "let antes de declarar dá erro.", code: `console.log(x);\nvar x = 5;\n// console.log(y);\nlet y = 10;`, output: "undefined" },
-                            { id: "aula27", title: "27. O 'this'", concept: "this aponta para o objeto 'dono' da função. Em arrow functions, é léxico.", exampleTitle: "Objeto e This", exampleDesc: "Acessando this.nome.", code: `const p = {\n  nome: "Ana",\n  falar: function() { console.log(this.nome); }\n};\np.falar();`, output: "Ana" },
-                            { id: "aula28", title: "28. Classes", concept: "Classes são 'moldes' para criar objetos. O constructor roda no momento da criação (new).", exampleTitle: "Fábrica de Jogadores", exampleDesc: "Gerando jogadores com hp inicial.", code: `class Jogador {\n  constructor(n) { this.nome = n; this.hp = 100; }\n}\nconst p1 = new Jogador("Faker");\nconsole.log(p1.hp);`, output: "100" },
-                            { id: "aula29", title: "29. Try/Catch", concept: "Evita que o servidor caia por uma requisição mal formatada. O catch intercepta o erro.", exampleTitle: "Lendo JSON Inválido", exampleDesc: "JSON.parse dá erro, mas o catch captura.", code: `try {\n  JSON.parse("{invalido}");\n} catch (err) {\n  console.log("Deu erro");\n}`, output: "Deu erro" },
-                            { id: "aula30", title: "30. Throw", concept: "Força um erro com throw new Error() quando uma regra de negócio for violada.", exampleTitle: "Bloqueando Login", exampleDesc: "Se a senha for curta, lança erro.", code: `function login(s) {\n  if(s.length < 4) throw new Error("Senha curta");\n  return "Ok";\n}\ntry {\n  login("12");\n} catch(e) {\n  console.log(e.message);\n}`, output: "Senha curta" }
+                            { id: "aula21", title: "21. Funções Clássicas", concept: "Declarações com function sofrem hoisting.", exampleTitle: "Soma", exampleDesc: "Declaração tradicional.", code: `console.log(soma(2, 3));\nfunction soma(a, b) { return a + b; }`, output: "5" },
+                            { id: "aula22", title: "22. Arrow Functions", concept: "Sintaxe curta. Não têm seu próprio this.", exampleTitle: "Calculo Rápido", exampleDesc: "Função de uma linha.", code: `const dobro = (n) => n * 2;\nconsole.log(dobro(5));`, output: "10" },
+                            { id: "aula23", title: "23. Parâmetros Default", concept: "Valor padrão caso o argumento não seja passado.", exampleTitle: "Dano Base", exampleDesc: "Se o multiplicador não for enviado, assume 1.", code: `const hit = (atk, mult = 1) => atk * mult;\nconsole.log(hit(100));\nconsole.log(hit(100, 2));`, output: "100\n200" },
+                            { id: "aula24", title: "24. Callbacks", concept: "Funções passadas como argumento. Executadas 'quando a outra terminar'.", exampleTitle: "Avisando o Front", exampleDesc: "Chamando a função de aviso quando termina.", code: `function aviso(msg) { console.log(msg); }\nfunction carregar(cb) {\n  setTimeout(() => cb("Pronto!"), 1000);\n}\ncarregar(aviso);`, output: "(1s) Pronto!" },
+                            { id: "aula25", title: "25. Closures", concept: "Função interna 'lembra' do ambiente onde foi criada.", exampleTitle: "Contador Privado", exampleDesc: "A variável count é inacessível de fora.", code: `function contador() {\n  let count = 0;\n  return () => { count++; return count; };\n}\nconst c = contador();\nc(); c();\nconsole.log(c());`, output: "3" },
+                            { id: "aula26", title: "26. Hoisting", concept: "var e functions são içadas. let e const vão para a Zona Morta.", exampleTitle: "Zona Morta", exampleDesc: "let antes de declarar dá erro.", code: `console.log(x);\nvar x = 5;\n// console.log(y);\nlet y = 10;`, output: "undefined" },
+                            { id: "aula27", title: "27. O 'this'", concept: "this aponta para o objeto 'dono'. Em arrow functions, é léxico.", exampleTitle: "Objeto e This", exampleDesc: "Acessando this.nome.", code: `const p = {\n  nome: "Ana",\n  falar: function() { console.log(this.nome); }\n};\np.falar();`, output: "Ana" },
+                            { id: "aula28", title: "28. Classes", concept: "Classes são 'moldes' para criar objetos.", exampleTitle: "Fábrica de Jogadores", exampleDesc: "Gerando jogadores com hp inicial.", code: `class Jogador {\n  constructor(n) { this.nome = n; this.hp = 100; }\n}\nconst p1 = new Jogador("Faker");\nconsole.log(p1.hp);`, output: "100" },
+                            { id: "aula29", title: "29. Try/Catch", concept: "Evita que o servidor caia por uma requisição mal formatada.", exampleTitle: "Lendo JSON Inválido", exampleDesc: "JSON.parse dá erro, mas o catch captura.", code: `try {\n  JSON.parse("{invalido}");\n} catch (err) {\n  console.log("Deu erro");\n}`, output: "Deu erro" },
+                            { id: "aula30", title: "30. Throw", concept: "Força um erro com throw new Error() quando uma regra for violada.", exampleTitle: "Bloqueando Login", exampleDesc: "Se a senha for curta, lança erro.", code: `function login(s) {\n  if(s.length < 4) throw new Error("Senha curta");\n  return "Ok";\n}\ntry {\n  login("12");\n} catch(e) {\n  console.log(e.message);\n}`, output: "Senha curta" }
                         ]
                     },
                     {
                         id: "mod4", title: "Módulo 4: Backend e Assíncrono", level: "Avançado", status: "aberto",
                         lessons: [
-                            { id: "aula31", title: "31. Síncrono vs Assíncrono", concept: "JS roda em uma thread. Operações demoradas vão para segundo plano para não travar a tela.", exampleTitle: "A Prova do Event Loop", exampleDesc: "setTimeout joga a tarefa para a fila.", code: `console.log("1");\nsetTimeout(() => console.log("2"), 0);\nconsole.log("3");`, output: "1\n3\n2" },
-                            { id: "aula32", title: "32. Promises", concept: "Objetos que representam o sucesso/falha de uma operação assíncrona. Estados: pending, fulfilled, rejected.", exampleTitle: "A Promessa", exampleDesc: "Promise que resolve após 1s.", code: `const p = new Promise((resolve) => {\n  setTimeout(() => resolve("Dados OK"), 1000);\n});\np.then(msg => console.log(msg));`, output: "(1s) Dados OK" },
+                            { id: "aula31", title: "31. Síncrono vs Assíncrono", concept: "JS roda em uma thread. Operações demoradas vão para segundo plano.", exampleTitle: "A Prova do Event Loop", exampleDesc: "setTimeout joga a tarefa para a fila.", code: `console.log("1");\nsetTimeout(() => console.log("2"), 0);\nconsole.log("3");`, output: "1\n3\n2" },
+                            { id: "aula32", title: "32. Promises", concept: "Objetos que representam o sucesso/falha de uma operação.", exampleTitle: "A Promessa", exampleDesc: "Promise que resolve após 1s.", code: `const p = new Promise((resolve) => {\n  setTimeout(() => resolve("Dados OK"), 1000);\n});\np.then(msg => console.log(msg));`, output: "(1s) Dados OK" },
                             { id: "aula33", title: "33. Then / Catch", concept: ".then() roda no sucesso. .catch() captura o erro.", exampleTitle: "Tratando Falha", exampleDesc: "A promise falha e cai no catch.", code: `new Promise((_, reject) => reject("Offline"))\n  .then(d => console.log(d))\n  .catch(e => console.log("Erro: " + e));`, output: "Erro: Offline" },
-                            { id: "aula34", title: "34. Async / Await", concept: "Forma moderna de lidar com Promises. await pausa a função até a Promise resolver, sem travar a thread.", exampleTitle: "Buscando Perfil", exampleDesc: "Código mais limpo.", code: `async function buscar() {\n  const res = await Promise.resolve("Faker");\n  console.log("Nome: " + res);\n}\nbuscar();`, output: "Nome: Faker" },
-                            { id: "aula35", title: "35. Fetch API", concept: "Padrão para requisições HTTP (GET, POST). Retorna uma Promise com a resposta do servidor.", exampleTitle: "Chamando Servidor", exampleDesc: "Simulando chamada de rede.", code: `async function get() { return "Dados da Riot"; }\n(async () => {\n  console.log(await get());\n})();`, output: "Dados da Riot" },
-                            { id: "aula36", title: "36. Event Loop na Prática", concept: "Síncrono roda primeiro. Depois Promises (Microtasks). Depois setTimeout (Macrotasks).", exampleTitle: "A Ordem do Universo", exampleDesc: "Promises rodam antes de setTimeout.", code: `setTimeout(() => console.log("Macro"), 0);\nPromise.resolve().then(() => console.log("Micro"));\nconsole.log("Sync");`, output: "Sync\nMicro\nMacro" },
-                            { id: "aula37", title: "37. SetInterval", concept: "Roda uma função repetidamente. O clearInterval() é crucial para parar o timer.", exampleTitle: "Timer de Partida", exampleDesc: "Contando até 3 e parando.", code: `let i = 0;\nconst id = setInterval(() => {\n  i++; console.log(i);\n  if(i === 3) clearInterval(id);\n}, 1000);`, output: "1\n2\n3" },
-                            { id: "aula38", title: "38. LocalStorage", concept: "API do navegador para salvar dados persistentes (strings). Não existe no Node.js.", exampleTitle: "Salvando o Tema", exampleDesc: "Salvando e lendo.", code: `localStorage.setItem("tema", "dark");\nconst tema = localStorage.getItem("tema");\nconsole.log(tema);`, output: "dark" },
-                            { id: "aula39", title: "39. Manipulação de DOM", concept: "Alterar a estrutura do HTML via JS (textos, cores, elementos).", exampleTitle: "Alterando o Título", exampleDesc: "Mudando o conteúdo pelo ID.", code: `// document.getElementById("titulo").innerText = "Novo";\nconsole.log("DOM alterado");`, output: "DOM alterado" },
-                            { id: "aula40", title: "40. Eventos", concept: "Ações do usuário (cliques, digitação). Usamos addEventListener para ouvir e executar funções.", exampleTitle: "Botão de Iniciar", exampleDesc: "Listener no botão.", code: `// btn.addEventListener("click", () => alert("Iniciou!"));\nconsole.log("Evento disparado");`, output: "Evento disparado" }
+                            { id: "aula34", title: "34. Async / Await", concept: "Forma moderna de lidar com Promises. await pausa a função.", exampleTitle: "Buscando Perfil", exampleDesc: "Código mais limpo.", code: `async function buscar() {\n  const res = await Promise.resolve("Faker");\n  console.log("Nome: " + res);\n}\nbuscar();`, output: "Nome: Faker" },
+                            { id: "aula35", title: "35. Fetch API", concept: "Padrão para requisições HTTP. Retorna uma Promise.", exampleTitle: "Chamando Servidor", exampleDesc: "Simulando chamada de rede.", code: `async function get() { return "Dados da Riot"; }\n(async () => {\n  console.log(await get());\n})();`, output: "Dados da Riot" },
+                            { id: "aula36", title: "36. Event Loop na Prática", concept: "Síncrono roda primeiro. Depois Promises. Depois setTimeout.", exampleTitle: "A Ordem do Universo", exampleDesc: "Promises rodam antes de setTimeout.", code: `setTimeout(() => console.log("Macro"), 0);\nPromise.resolve().then(() => console.log("Micro"));\nconsole.log("Sync");`, output: "Sync\nMicro\nMacro" },
+                            { id: "aula37", title: "37. SetInterval", concept: "Roda uma função repetidamente. clearInterval() para o timer.", exampleTitle: "Timer de Partida", exampleDesc: "Contando até 3 e parando.", code: `let i = 0;\nconst id = setInterval(() => {\n  i++; console.log(i);\n  if(i === 3) clearInterval(id);\n}, 1000);`, output: "1\n2\n3" },
+                            { id: "aula38", title: "38. LocalStorage", concept: "API do navegador para salvar dados persistentes (strings).", exampleTitle: "Salvando o Tema", exampleDesc: "Salvando e lendo.", code: `localStorage.setItem("tema", "dark");\nconst tema = localStorage.getItem("tema");\nconsole.log(tema);`, output: "dark" },
+                            { id: "aula39", title: "39. Manipulação de DOM", concept: "Alterar a estrutura do HTML via JS.", exampleTitle: "Alterando o Título", exampleDesc: "Mudando o conteúdo pelo ID.", code: `// document.getElementById("titulo").innerText = "Novo";\nconsole.log("DOM alterado");`, output: "DOM alterado" },
+                            { id: "aula40", title: "40. Eventos", concept: "Ações do usuário. addEventListener para ouvir e executar.", exampleTitle: "Botão de Iniciar", exampleDesc: "Listener no botão.", code: `// btn.addEventListener("click", () => alert("Iniciou!"));\nconsole.log("Evento disparado");`, output: "Evento disparado" }
                         ]
                     },
                     {
                         id: "mod5", title: "Módulo 5: Desafios Práticos", level: "Prática", status: "aberto",
                         lessons: [
-                            { id: "ex01", title: "Desafio 01. Calculadora de KDA", concept: "Crie uma função que calcula o KDA. Se as mortes forem 0, use Math.max para não dividir por zero.", exampleTitle: "Evitando Infinity", exampleDesc: "Math.max(deaths, 1) garante o cálculo seguro.", code: `const calcKDA = (k, a, d) => {\n    return (k + a) / Math.max(d, 1);\n};\nconsole.log(calcKDA(10, 5, 0));`, output: "15" },
+                            { id: "ex01", title: "Desafio 01. Calculadora de KDA", concept: "Calcula KDA. Use Math.max para não dividir por zero.", exampleTitle: "Evitando Infinity", exampleDesc: "Math.max(deaths, 1) garante o cálculo seguro.", code: `const calcKDA = (k, a, d) => {\n    return (k + a) / Math.max(d, 1);\n};\nconsole.log(calcKDA(10, 5, 0));`, output: "15" },
                             { id: "ex02", title: "Desafio 02. Filtro de Banidos", concept: "Use filter para achar jogadores com mais de 5 reports e map para extrair os IDs.", exampleTitle: "Lista de Banimentos", exampleDesc: "Filtrando e mapeando.", code: `const players = [{ id: 1, reports: 2 }, { id: 2, reports: 8 }];\nconst banidos = players.filter(p => p.reports > 5).map(p => p.id);\nconsole.log(banidos);`, output: "[ 2 ]" },
                             { id: "ex03", title: "Desafio 03. Maior Kill Streak", concept: "Encontre o maior número em um array de kill streaks.", exampleTitle: "O Recordista", exampleDesc: "Percorrendo o array.", code: `const streaks = [3, 7, 2, 15, 8];\nlet maior = 0;\nfor (let s of streaks) {\n  if (s > maior) maior = s;\n}\nconsole.log("Maior: " + maior);`, output: "Maior: 15" },
                             { id: "ex04", title: "Desafio 04. Validação de Login", concept: "Use try/catch para garantir que o usuário enviou email e senha.", exampleTitle: "Segurança", exampleDesc: "Lançando erro se faltar dados.", code: `function login(e, s) {\n  if (!e || !s) throw new Error("Incompleto");\n  return "Logado";\n}\ntry {\n  console.log(login("", "123"));\n} catch (e) {\n  console.log(e.message);\n}`, output: "Incompleto" },
@@ -516,6 +517,7 @@
                     if (users[u].streak === undefined) users[u].streak = 1;
                     if (users[u].bookmarks === undefined) users[u].bookmarks = [];
                     if (users[u].notes === undefined) users[u].notes = {};
+                    if (users[u].progress === undefined) users[u].progress = []; // Safety check
                     DataManager.saveUsers(users);
                     DataManager.saveSession({ username: u });
                     document.getElementById('login-modal').classList.remove('active');
@@ -577,7 +579,6 @@
                 const xp = user.xp || 0; const streak = user.streak || 0;
                 const level = Math.floor(xp / 200) + 1;
                 
-                // Atualiza o perfil da sidebar (só é chamado dentro da track)
                 document.getElementById('user-profile').innerHTML = `
                     <div class="user-stats">
                         <div class="stat-item"><div class="stat-value">${level}</div><div class="stat-label">Nível</div></div>
@@ -589,6 +590,7 @@
             },
             openProfile: () => {
                 const session = DataManager.getSession();
+                if(!session) return;
                 const user = DataManager.getUsers()[session.username];
                 const level = Math.floor((user.xp || 0) / 200) + 1;
                 document.getElementById('profile-name-display').innerText = session.username;
@@ -605,7 +607,7 @@
             showHub: () => {
                 document.body.className = 'in-hub';
                 document.getElementById('welcome-screen').style.display = 'none';
-                document.getElementById('hub-screen').style.display = 'flex'; // Flex para centralizar
+                document.getElementById('hub-screen').style.display = 'flex'; 
                 document.getElementById('encyclopedia-screen').style.display = 'none';
                 document.getElementById('lesson-screen').style.display = 'none';
                 UI.renderTracks();
@@ -646,7 +648,7 @@
                 document.getElementById('encyclopedia-screen').style.display = 'none';
                 document.getElementById('lesson-screen').style.display = 'block';
                 
-                UI.renderUser(); // Renderiza o perfil na sidebar
+                UI.renderUser(); 
                 UI.renderSidebar(track);
                 
                 const firstMod = track.modules[0];
@@ -655,7 +657,7 @@
             renderSidebar: (track) => {
                 const nav = document.getElementById('nav-menu'); nav.innerHTML = '';
                 const session = DataManager.getSession();
-                const progress = session ? DataManager.getUsers()[session.username].progress : [];
+                const progress = session && DataManager.getUsers()[session.username].progress ? DataManager.getUsers()[session.username].progress : [];
                 track.modules.forEach(mod => {
                     const titleEl = document.createElement('div'); 
                     titleEl.className = 'module-title'; 
@@ -685,50 +687,61 @@
                 items.forEach(item => { item.style.display = item.innerText.toLowerCase().includes(q) ? 'flex' : 'none'; });
             },
             loadLesson: (lesson, moduleId) => {
-                currentLesson = lesson; currentModuleId = moduleId; UI.renderSidebar(currentTrack);
-                const session = DataManager.getSession();
-                const user = DataManager.getUsers()[session.username];
-                const isCompleted = user.progress.includes(lesson.id);
-                const isStarred = user.bookmarks.includes(lesson.id);
-                const note = user.notes[lesson.id] || '';
-                const screen = document.getElementById('lesson-screen');
-                
-                screen.innerHTML = `
-                    <div class="lesson-topbar">
-                        <span class="badge">${currentTrack.title}</span>
-                        <div class="action-btns">
-                            <button class="btn-icon ${isStarred ? 'starred' : ''}" onclick="UI.toggleBookmark('${lesson.id}')">${isStarred ? '★ Favoritado' : '☆ Favoritar'}</button>
-                        </div>
-                    </div>
-                    <div class="lesson-header">
-                        <h1>${lesson.title}</h1>
-                        <div class="lesson-actions">
-                            <button class="btn-complete ${isCompleted ? 'done' : ''}" onclick="UI.toggleComplete('${lesson.id}')">
-                                ${isCompleted ? '✅ Concluído' : '🟢 Marcar Concluído (+50 XP)'}
-                            </button>
-                            <button class="btn-download" onclick="UI.downloadCode('${lesson.id}', \`${lesson.code}\`)">⬇️ Baixar .js</button>
-                        </div>
-                    </div>
-                    <div class="info-card"><h3>📖 Conceito</h3><p>${lesson.concept}</p></div>
-                    <div class="info-card example"><h3>🌍 ${lesson.exampleTitle}</h3><p style="margin-bottom: 0.5rem;">${lesson.exampleDesc}</p></div>
-                    <div class="info-card" style="background: var(--bg-base); padding: 0; overflow: hidden;">
-                        <div class="playground-header" style="padding: 10px 15px; margin: 0; background: var(--bg-surface); border-bottom: 1px solid var(--border);">
-                            <h3 style="margin: 0; font-size: 0.9rem;">💻 Playground (Monaco)</h3>
-                            <button class="btn-run" onclick="Playground.run()">▶ Executar</button>
-                        </div>
-                        <div style="padding: 10px;">
-                            <div id="monaco-editor"></div>
-                            <div class="console-output" id="console-output">> Console...</div>
-                        </div>
-                    </div>
-                    <div class="info-card"><h3>📝 Suas Anotações</h3><textarea class="notes-area" id="lesson-notes" onblur="UI.saveNote('${lesson.id}')" placeholder="Anote suas dúvidas...">${note}</textarea></div>
-                `;
-                
-                setTimeout(() => { Playground.init(lesson.code); }, 50);
+                try {
+                    currentLesson = lesson; currentModuleId = moduleId; UI.renderSidebar(currentTrack);
+                    const session = DataManager.getSession();
+                    if(!session) return;
+                    const user = DataManager.getUsers()[session.username];
+                    if (!user.progress) user.progress = [];
+                    if (!user.bookmarks) user.bookmarks = [];
+                    if (!user.notes) user.notes = {};
 
-                const totalLessons = currentTrack.modules.flatMap(m => m.lessons).length;
-                const completed = currentTrack.modules.flatMap(m => m.lessons).filter(l => user.progress.includes(l.id)).length;
-                if(totalLessons > 0 && completed === totalLessons) setTimeout(() => UI.generateCert(), 500);
+                    const isCompleted = user.progress.includes(lesson.id);
+                    const isStarred = user.bookmarks.includes(lesson.id);
+                    const note = user.notes[lesson.id] || '';
+                    const screen = document.getElementById('lesson-screen');
+                    
+                    screen.innerHTML = `
+                        <div class="lesson-topbar">
+                            <span class="badge">${currentTrack.title}</span>
+                            <div class="action-btns">
+                                <button class="btn-icon ${isStarred ? 'starred' : ''}" onclick="UI.toggleBookmark('${lesson.id}')">${isStarred ? '★ Favoritado' : '☆ Favoritar'}</button>
+                            </div>
+                        </div>
+                        <div class="lesson-header">
+                            <h1>${lesson.title}</h1>
+                            <div class="lesson-actions">
+                                <button class="btn-complete ${isCompleted ? 'done' : ''}" onclick="UI.toggleComplete('${lesson.id}')">
+                                    ${isCompleted ? '✅ Concluído' : '🟢 Marcar Concluído (+50 XP)'}
+                                </button>
+                                <button class="btn-download" onclick="UI.downloadCode('${lesson.id}')">⬇️ Baixar .js</button>
+                            </div>
+                        </div>
+                        <div class="info-card"><h3>📖 Conceito</h3><p>${lesson.concept}</p></div>
+                        <div class="info-card example"><h3>🌍 ${lesson.exampleTitle}</h3><p style="margin-bottom: 0.5rem;">${lesson.exampleDesc}</p></div>
+                        <div class="info-card" style="background: var(--bg-base); padding: 0; overflow: hidden;">
+                            <div class="playground-header" style="padding: 10px 15px; margin: 0; background: var(--bg-surface); border-bottom: 1px solid var(--border);">
+                                <h3 style="margin: 0; font-size: 0.9rem;">💻 Playground (Monaco)</h3>
+                                <button class="btn-run" onclick="Playground.run()">▶ Executar</button>
+                            </div>
+                            <div style="padding: 10px;">
+                                <div id="monaco-editor"></div>
+                                <div class="console-output" id="console-output">> Console...</div>
+                            </div>
+                        </div>
+                        <div class="info-card"><h3>📝 Suas Anotações</h3><textarea class="notes-area" id="lesson-notes" onblur="UI.saveNote('${lesson.id}')" placeholder="Anote suas dúvidas...">${note}</textarea></div>
+                    `;
+                    
+                    setTimeout(() => { 
+                        try { Playground.init(lesson.code); } catch(e) { console.error(e); }
+                    }, 50);
+
+                    const totalLessons = currentTrack.modules.flatMap(m => m.lessons).length;
+                    const completed = currentTrack.modules.flatMap(m => m.lessons).filter(l => user.progress.includes(l.id)).length;
+                    if(totalLessons > 0 && completed === totalLessons) setTimeout(() => UI.generateCert(), 500);
+                } catch (error) {
+                    console.error("Erro ao carregar aula:", error);
+                }
             },
             toggleBookmark: (id) => {
                 const session = DataManager.getSession(); const users = DataManager.getUsers(); const user = users[session.username];
@@ -760,9 +773,15 @@
                 ctx.font = '10px Inter'; ctx.fillText(new Date().toLocaleDateString(), 200, 250);
                 document.getElementById('download-cert').href = canvas.toDataURL("image/png"); document.getElementById('download-cert').download = "certificado.png"; document.getElementById('cert-modal').classList.add('active');
             },
-            downloadCode: (name, code) => {
-                const blob = new Blob([code], { type: 'text/javascript' }); const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob); a.download = `${name}.js`; a.click(); Toast.show("Download iniciado.", "success");
+            downloadCode: (id) => {
+                const lesson = currentTrack.modules.flatMap(m => m.lessons).find(l => l.id === id);
+                if(!lesson) return;
+                const blob = new Blob([lesson.code], { type: 'text/javascript' }); 
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob); 
+                a.download = `${id}.js`; 
+                a.click(); 
+                Toast.show("Download iniciado.", "success");
             },
             copyPix: (btn, key) => {
                 navigator.clipboard.writeText(key).then(() => {
