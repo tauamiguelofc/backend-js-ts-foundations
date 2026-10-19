@@ -6,224 +6,283 @@
     <title>Fundamentos JS/TS | Plataforma de Ensino</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
-    <!-- PRISM.JS: Motor de cores do código -->
+    <!-- PRISM.JS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
 
+    <!-- MONACO EDITOR -->
+    <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/editor/editor.main.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
+
     <style>
-        /* ================= TEMAS (Dark e Light) ================= */
         :root {
-            /* Tema Dark (Padrão) */
             --bg-base: #09090b; --bg-surface: #18181b; --bg-surface-hover: #27272a;
             --border: #27272a; --primary: #6366f1; --primary-hover: #4f46e5;
             --primary-glow: rgba(99, 102, 241, 0.15); --text-main: #f4f4f5;
-            --text-muted: #a1a1aa; --success: #10b981; --danger: #ef4444;
+            --text-muted: #a1a1aa; --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
             --font-main: 'Inter', sans-serif; --font-code: 'JetBrains Mono', monospace;
         }
-
         [data-theme="light"] {
-            /* Tema Light */
             --bg-base: #f8fafc; --bg-surface: #ffffff; --bg-surface-hover: #f1f5f9;
             --border: #e2e8f0; --primary: #4f46e5; --primary-hover: #4338ca;
             --primary-glow: rgba(79, 70, 229, 0.1); --text-main: #0f172a;
-            --text-muted: #64748b; --success: #059669; --danger: #dc2626;
+            --text-muted: #64748b; --success: #059669; --danger: #dc2626; --warning: #d97706;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.3s, border-color 0.3s; }
-        body { font-family: var(--font-main); background-color: var(--bg-base); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; font-size: 14px; }
+        /* REMOVENDO SCROLLBARS GLOBAIS */
+        ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
+        * { scrollbar-width: none; -ms-overflow-style: none; }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-        /* ================= TELA DE LOADING ================= */
-        #loader-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-base); z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease;
-        }
-        .loader-logo { width: 80px; height: 80px; object-fit: contain; margin-bottom: 1.5rem; animation: pulse 2s infinite; }
-        .loader-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main); }
-        .loader-text { font-size: 0.9rem; color: var(--text-muted); height: 20px; margin-bottom: 2rem; }
-        .spinner { width: 30px; height: 30px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
-
-        /* ================= SIDEBAR ================= */
-        .sidebar { width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.2s, border-color 0.2s; }
         
-        .brand { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        .brand-left { display: flex; align-items: center; gap: 10px; }
-        .brand-icon { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: transparent; }
+        body { 
+            font-family: var(--font-main); 
+            background-color: var(--bg-base); 
+            color: var(--text-main); 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden; 
+            font-size: 13px; 
+        }
+
+        body.in-hub .context-only { display: none !important; }
+        body.in-track .context-only { display: block; }
+
+        /* TOAST */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast { background: var(--bg-surface); border-left: 4px solid var(--primary); padding: 10px 16px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); color: var(--text-main); display: flex; align-items: center; gap: 10px; animation: slideIn 0.2s forwards; font-weight: 500; font-size: 0.85rem;}
+        .toast.success { border-left-color: var(--success); }
+        .toast.danger { border-left-color: var(--danger); }
+
+        /* TELA DE LOADING */
+        #loader-screen { position: fixed; inset: 0; background: var(--bg-base); z-index: 9998; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s; }
+        .loader-logo { width: 60px; height: 60px; object-fit: contain; margin-bottom: 1rem; animation: pulse 2s infinite; }
+        .loader-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .loader-text { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+        .spinner { width: 20px; height: 20px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+
+        /* SIDEBAR */
+        .sidebar { width: 250px; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; }
+        .brand { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .brand-left { display: flex; align-items: center; gap: 8px; }
+        .brand-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
         .brand-icon img { width: 100%; height: 100%; object-fit: contain; }
-        .brand h1 { font-size: 1rem; font-weight: 700; }
-        .brand span { font-size: 0.6rem; background: var(--primary-glow); color: var(--primary); padding: 2px 5px; border-radius: 4px; border: 1px solid var(--primary); margin-left: 6px; }
+        .brand h1 { font-size: 0.9rem; font-weight: 700; }
         
-        .theme-toggle { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; transition: 0.2s; padding: 4px; border-radius: 4px; }
-        .theme-toggle:hover { color: var(--primary); background: var(--bg-surface-hover); }
+        .user-profile { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); }
+        .user-stats { display: flex; justify-content: space-between; margin-bottom: 8px; background: var(--bg-base); padding: 6px; border-radius: 6px; border: 1px solid var(--border); }
+        .stat-item { text-align: center; flex: 1; }
+        .stat-value { font-weight: 700; font-size: 0.85rem; color: var(--primary); }
+        .stat-label { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; }
+        .streak-fire { color: var(--warning); }
 
-        .user-profile { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        .user-info { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-surface-hover); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); font-size: 0.8rem; }
-        .user-name { font-size: 0.85rem; font-weight: 600; }
-        .user-status { font-size: 0.7rem; color: var(--text-muted); }
-        .btn-login { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 0.8rem; transition: 0.2s; width: 100%; }
-        .btn-login:hover { background: var(--primary-hover); }
-
-        .progress-container { padding: 1rem 1.5rem; }
-        .progress-header { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 6px; color: var(--text-muted); }
-        .progress-bar { width: 100%; height: 6px; background: var(--bg-base); border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.5s ease-out; }
+        .search-box { padding: 0 1rem 0.8rem 1rem; }
+        .search-box input { width: 100%; padding: 6px 10px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 4px; color: var(--text-main); font-family: var(--font-main); outline: none; font-size: 0.8rem; }
+        .search-box input:focus { border-color: var(--primary); }
+        .btn-encyclopedia { margin: 0 1rem 0.8rem 1rem; width: calc(100% - 2rem); padding: 6px; background: var(--primary-glow); border: 1px solid var(--primary); color: var(--primary); border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
+        .btn-encyclopedia:hover { background: var(--primary); color: white; }
 
         .nav-menu { flex: 1; overflow-y: auto; padding: 0.5rem 0; }
-        .module-title { padding: 0.5rem 1.5rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 1rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-        .module-title .badge { background: var(--bg-surface-hover); padding: 2px 6px; border-radius: 10px; font-size: 0.6rem; }
-        .nav-item { padding: 0.6rem 1.5rem; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; border-left: 2px solid transparent; font-size: 0.85rem; color: var(--text-muted); }
+        .nav-item { padding: 0.5rem 1rem; display: flex; align-items: center; gap: 8px; cursor: pointer; border-left: 2px solid transparent; font-size: 0.8rem; color: var(--text-muted); }
         .nav-item:hover:not(.locked) { background: var(--bg-surface-hover); color: var(--text-main); }
-        .nav-item.active { background: var(--primary-glow); border-left-color: var(--primary); color: var(--primary); font-weight: 500; }
         .nav-item.completed { color: var(--text-main); }
         .nav-item.completed .icon { color: var(--success); }
-        .nav-item.locked { opacity: 0.5; cursor: not-allowed; }
-        .nav-item .icon { width: 16px; text-align: center; font-size: 0.8rem; }
-
-        .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); }
-        .btn-donate { width: 100%; padding: 8px; background: transparent; border: 1px solid var(--border); color: var(--text-main); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; font-weight: 500; font-size: 0.8rem; }
-        .btn-donate:hover { background: var(--bg-surface-hover); border-color: var(--text-muted); }
-
-        /* ================= MAIN CONTENT ================= */
-        .main-content { flex: 1; overflow-y: auto; position: relative; background: radial-gradient(circle at 50% 0%, var(--primary-glow) 0%, transparent 50%); }
+        .nav-item.active { background: var(--primary-glow); border-left-color: var(--primary); color: var(--primary); font-weight: 500; }
         
-        .hero { padding: 3rem; display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; border-bottom: 1px solid var(--border); height: 100%; justify-content: center; }
-        .hero h2 { font-size: 2.2rem; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; max-width: 600px; color: var(--text-main); }
-        .hero p { color: var(--text-muted); max-width: 500px; font-size: 0.95rem; }
-        .btn-start { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; margin-top: 0.5rem; }
-        .btn-start:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .module-title { padding: 1rem 1rem 0.4rem 1rem; font-size: 0.65rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .content-area { padding: 2rem 3rem; max-width: 900px; margin: 0 auto; display: none; animation: fadeIn 0.3s ease-out; }
-        .content-area.active { display: block; }
+        .sidebar-footer { padding: 0.8rem 1rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+        .btn-sidebar { width: 100%; padding: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-main); border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;}
+        .btn-sidebar:hover { background: var(--bg-surface-hover); }
+        .btn-sidebar.primary { background: var(--primary); border-color: var(--primary); color: white; }
 
-        .level-guide { background: var(--bg-surface); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
-        .level-guide h4 { font-size: 0.95rem; color: var(--primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 6px; }
-        .level-guide p { color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; }
-
-        .lesson-header { margin-bottom: 1.5rem; }
-        .lesson-badge { display: inline-block; background: var(--bg-surface-hover); color: var(--text-muted); padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; margin-bottom: 0.75rem; border: 1px solid var(--border); }
-        .lesson-header h1 { font-size: 1.6rem; margin-bottom: 0.75rem; color: var(--text-main); }
+        /* MAIN CONTENT */
+        .main-content { flex: 1; overflow-y: auto; position: relative; background: radial-gradient(circle at 50% 0%, var(--primary-glow) 0%, transparent 40%); display: flex; flex-direction: column; align-items: center; }
         
-        .lesson-actions { display: flex; gap: 10px; margin-bottom: 1.5rem; }
-        .btn-complete { background: transparent; border: 1px solid var(--success); color: var(--success); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
-        .btn-complete:hover { background: var(--primary-glow); }
+        /* HUB DE TRILHAS */
+        .hub-screen { padding: 3rem 2rem; width: 100%; max-width: 900px; animation: fadeIn 0.3s; }
+        .hub-header { text-align: center; margin-bottom: 2.5rem; }
+        .hub-header h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-main); }
+        .hub-header p { color: var(--text-muted); font-size: 0.95rem; }
+        
+        .tracks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.2rem; justify-content: center; }
+        .track-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column;}
+        .track-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 8px 20px var(--primary-glow); }
+        .track-icon { font-size: 2.2rem; margin-bottom: 0.8rem; }
+        .track-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; }
+        .track-desc { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.2rem; line-height: 1.5; flex: 1;}
+        .track-meta { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+        .badge { background: var(--bg-base); border: 1px solid var(--border); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 500;}
+        .progress-bar { width: 100%; height: 5px; background: var(--bg-base); border-radius: 3px; overflow: hidden;}
+        .progress-fill { height: 100%; background: var(--primary); border-radius: 3px; }
+
+        /* TELA DE AULA */
+        .lesson-screen { padding: 2rem; max-width: 850px; width: 100%; display: none; animation: fadeIn 0.2s; }
+        .lesson-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: var(--bg-surface); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); }
+        .action-btns { display: flex; gap: 10px; }
+        .btn-icon { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.8rem; transition: 0.2s; display: flex; align-items: center; gap: 4px;}
+        .btn-icon:hover { color: var(--primary); }
+        .btn-icon.starred { color: var(--warning); }
+
+        .lesson-header h1 { font-size: 1.6rem; margin-bottom: 1rem; }
+        .lesson-actions { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+        .btn-complete { background: transparent; border: 1px solid var(--success); color: var(--success); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-complete:hover { background: rgba(16, 185, 129, 0.1); }
         .btn-complete.done { background: var(--success); color: white; }
-        
-        .btn-download { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-download { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
         .btn-download:hover { background: var(--primary-glow); }
 
-        .info-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; }
-        .info-card h3 { font-size: 0.95rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
-        .info-card p { color: var(--text-muted); line-height: 1.6; font-size: 0.9rem; }
+        .info-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.2rem; }
+        .info-card h3 { font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-main); display: flex; align-items: center; gap: 6px;}
+        .info-card p { color: var(--text-muted); line-height: 1.6; font-size: 0.85rem;}
         .info-card.example { border-left: 3px solid var(--primary); background: linear-gradient(90deg, var(--primary-glow) 0%, var(--bg-surface) 100%); }
-
-        .code-wrapper { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem; background: #000; }
-        .code-header { background: #18181b; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #27272a; font-family: var(--font-code); font-size: 0.75rem; color: #a1a1aa; }
-        .code-wrapper pre { margin: 0 !important; padding: 1.25rem !important; background: transparent !important; font-family: var(--font-code) !important; font-size: 0.85rem !important; border-radius: 0 !important; }
-        .output-block { background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-family: var(--font-code); font-size: 0.85rem; color: #a1a1aa; margin-bottom: 2rem; }
-        .output-block .term { color: #10b981; margin-bottom: 6px; display: block; font-weight: 600; font-size: 0.8rem; }
-
-        /* Modais */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; }
-        .modal-overlay.active { display: flex; }
-        .modal { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; width: 100%; max-width: 350px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5); animation: scaleIn 0.2s ease-out; position: relative; }
-        .modal h2 { text-align: center; margin-bottom: 1.5rem; font-size: 1.2rem; color: var(--text-main); }
-        .input-group { margin-bottom: 1rem; }
-        .input-group label { display: block; margin-bottom: 0.4rem; font-size: 0.8rem; color: var(--text-muted); }
-        .input-group input { width: 100%; padding: 10px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 6px; color: var(--text-main); font-family: var(--font-main); font-size: 0.85rem; outline: none; transition: 0.2s; }
-        .input-group input:focus { border-color: var(--primary); }
-        .modal-btns { display: flex; gap: 8px; margin-top: 1.5rem; }
-        .btn-primary { flex: 1; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: 0.2s; }
-        .btn-primary:hover { background: var(--primary-hover); }
-        .btn-secondary { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: 0.2s; }
-        .btn-secondary:hover { background: var(--bg-surface-hover); }
         
-        .btn-close { position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
-        .btn-close:hover { color: var(--danger); }
+        .notes-area { width: 100%; height: 80px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 6px; padding: 10px; color: var(--text-main); font-family: var(--font-main); resize: none; outline: none; margin-top: 8px; font-size: 0.85rem; }
+        .notes-area:focus { border-color: var(--primary); }
 
+        .playground-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .btn-run { background: var(--success); color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.8rem;}
+        #monaco-editor { width: 100%; height: 220px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 8px; }
+        .console-output { background: #000; color: #10b981; padding: 10px; border-radius: 6px; font-family: var(--font-code); font-size: 0.8rem; min-height: 50px; white-space: pre-wrap; border: 1px solid var(--border); }
+
+        /* MODAIS */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: 100; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; width: 100%; max-width: 350px; position: relative; animation: scaleIn 0.2s; }
+        
+        .profile-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        .profile-avatar { width: 60px; height: 60px; border-radius: 50%; background: var(--bg-base); border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 0.8rem; }
+        .profile-name { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+        .profile-level { font-size: 0.8rem; color: var(--primary); font-weight: 600; margin-top: 4px; }
+
+        .input-group { margin-bottom: 0.8rem; }
+        .input-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; }
+        .input-group input { width: 100%; padding: 8px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 4px; color: var(--text-main); outline: none; font-size: 0.85rem;}
+        .modal-btns { display: flex; gap: 8px; margin-top: 1.2rem; }
+        .btn-primary { flex: 1; background: var(--primary); color: white; padding: 8px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem;}
+        .btn-secondary { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 8px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;}
+        .btn-close { position: absolute; top: 0.8rem; right: 0.8rem; background: transparent; border: none; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; }
+
+        /* ENCICLOPÉDIA */
+        .encyclopedia-screen { padding: 2.5rem 2rem; width: 100%; max-width: 900px; display: none; animation: fadeIn 0.3s; }
+        .encyclopedia-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.2rem; margin-top: 1.5rem; }
+        .op-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; }
+        .op-card h3 { font-size: 1rem; color: var(--primary); margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        .op-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; font-size: 0.85rem; }
+        .op-symbol { font-family: var(--font-code); background: var(--bg-base); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); color: var(--warning); font-weight: bold; }
+        .op-desc { color: var(--text-muted); text-align: right; font-size: 0.75rem;}
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
     </style>
 </head>
-<body>
+<body class="in-hub">
 
-    <!-- TELA DE LOADING -->
     <div id="loader-screen">
         <img src="jsbase.gif" alt="Logo" class="loader-logo">
         <div class="loader-title">Fundamentos JS/TS</div>
-        <div class="loader-text" id="loading-text">Iniciando sistema...</div>
+        <div class="loader-text">Preparando ambiente de estudos...</div>
         <div class="spinner"></div>
     </div>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <div id="toast-container"></div>
+
+    <aside class="sidebar" id="main-sidebar">
         <div class="brand">
             <div class="brand-left">
-                <div class="brand-icon">
-                    <img src="jsbase.gif" alt="Logo">
-                </div>
-                <div>
-                    <h1>Fundamentos JS/TS <span>v2.1</span></h1>
-                </div>
+                <div class="brand-icon"><img src="jsbase.gif" alt="Logo"></div>
+                <h1>Fundamentos</h1>
             </div>
-            <button class="theme-toggle" onclick="Theme.toggle()" title="Alternar Tema">🌓</button>
+            <button class="theme-toggle btn-icon" onclick="Theme.toggle()">🌓</button>
         </div>
 
         <div class="user-profile" id="user-profile"></div>
 
-        <div class="progress-container" id="progress-container" style="display: none;">
-            <div class="progress-header">
-                <span>Progresso</span>
-                <span id="progress-text">0%</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill"></div>
-            </div>
+        <div class="search-box context-only">
+            <input type="text" id="global-search" placeholder="🔍 Buscar aula..." oninput="UI.filterLessons(this.value)">
         </div>
+        <button class="btn-encyclopedia context-only" onclick="UI.showEncyclopedia()">
+            📚 Enciclopédia JS
+        </button>
 
         <nav class="nav-menu" id="nav-menu"></nav>
 
         <div class="sidebar-footer">
-            <button class="btn-donate" onclick="document.getElementById('donate-modal').classList.add('active')">
-                ☕ Apoie o Projeto
-            </button>
+            <button class="btn-sidebar context-only" onclick="UI.showHub()">🏠 Voltar para Trilhas</button>
+            <button class="btn-sidebar primary" onclick="document.getElementById('donate-modal').classList.add('active')">☕ Apoiar Projeto</button>
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-        <div class="hero" id="hero-screen">
-            <div class="lesson-badge" style="background: var(--primary-glow); color: var(--primary); border-color: var(--primary);">Plataforma de Ensino</div>
-            <h2>Domine a base do Backend.</h2>
-            <p>Documentação interativa da minha transição de carreira. Aprenda lógica, arquitetura e resolução de problemas com exemplos práticos do mundo dos jogos.</p>
-            <button class="btn-start" id="btn-start">▶️ Iniciar Estudos</button>
+    <main class="main-content" id="main-content">
+        
+        <div class="hub-screen" id="hub-screen">
+            <div class="hub-header">
+                <h2>Qual trilha vamos dominar hoje?</h2>
+                <p>Escolha seu caminho e comece a codar.</p>
+            </div>
+            <div class="tracks-grid" id="tracks-grid"></div>
         </div>
 
-        <div class="content-area" id="lesson-screen"></div>
+        <div class="lesson-screen" id="lesson-screen"></div>
+
+        <div class="encyclopedia-screen" id="encyclopedia-screen">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 800;">Enciclopédia JS</h2>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Sua cola mental para consulta rápida.</p>
+                </div>
+                <button class="btn-secondary" onclick="UI.backToLesson()" style="flex: none; padding: 6px 16px;">Voltar para Aula</button>
+            </div>
+            
+            <div class="encyclopedia-grid">
+                <div class="op-card">
+                    <h3>➕ Aritméticos</h3>
+                    <div class="op-item"><span class="op-symbol">+</span> <span class="op-desc">Adição / Concatenação</span></div>
+                    <div class="op-item"><span class="op-symbol">-</span> <span class="op-desc">Subtração</span></div>
+                    <div class="op-item"><span class="op-symbol">*</span> <span class="op-desc">Multiplicação</span></div>
+                    <div class="op-item"><span class="op-symbol">/</span> <span class="op-desc">Divisão</span></div>
+                    <div class="op-item"><span class="op-symbol">%</span> <span class="op-desc">Resto da Divisão</span></div>
+                </div>
+
+                <div class="op-card">
+                    <h3>⚖️ Comparação</h3>
+                    <div class="op-item"><span class="op-symbol">===</span> <span class="op-desc">Estritamente Igual</span></div>
+                    <div class="op-item"><span class="op-symbol">!==</span> <span class="op-desc">Estritamente Diferente</span></div>
+                    <div class="op-item"><span class="op-symbol">></span> <span class="op-desc">Maior que</span></div>
+                    <div class="op-item"><span class="op-symbol"><</span> <span class="op-desc">Menor que</span></div>
+                    <div class="op-item"><span class="op-symbol">>=</span> <span class="op-desc">Maior ou Igual</span></div>
+                </div>
+
+                <div class="op-card">
+                    <h3>🧠 Lógicos</h3>
+                    <div class="op-item"><span class="op-symbol">&&</span> <span class="op-desc">E (AND)</span></div>
+                    <div class="op-item"><span class="op-symbol">||</span> <span class="op-desc">OU (OR)</span></div>
+                    <div class="op-item"><span class="op-symbol">!</span> <span class="op-desc">NÃO (NOT)</span></div>
+                </div>
+
+                <div class="op-card">
+                    <h3>💾 Atribuição</h3>
+                    <div class="op-item"><span class="op-symbol">=</span> <span class="op-desc">Atribuição Simples</span></div>
+                    <div class="op-item"><span class="op-symbol">+=</span> <span class="op-desc">x = x + y</span></div>
+                    <div class="op-item"><span class="op-symbol">++</span> <span class="op-desc">Incremento (+1)</span></div>
+                    <div class="op-item"><span class="op-symbol">--</span> <span class="op-desc">Decremento (-1)</span></div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- MODAL LOGIN -->
     <div class="modal-overlay" id="login-modal">
         <div class="modal">
-            <h2>Acessar Plataforma</h2>
-            <div class="input-group">
-                <label>Usuário</label>
-                <input type="text" id="login-user" placeholder="Ex: taua_dev">
-            </div>
-            <div class="input-group">
-                <label>Senha</label>
-                <input type="password" id="login-pass" placeholder="••••••••">
-            </div>
+            <h2 style="text-align: center; margin-bottom: 1.2rem; font-size:1.1rem;">Acessar Plataforma</h2>
+            <div class="input-group"><label>Usuário</label><input type="text" id="login-user"></div>
+            <div class="input-group"><label>Senha</label><input type="password" id="login-pass"></div>
             <div class="modal-btns">
                 <button class="btn-primary" onclick="Auth.login()">Entrar</button>
                 <button class="btn-secondary" onclick="Auth.register()">Criar Conta</button>
@@ -231,387 +290,450 @@
         </div>
     </div>
 
-    <!-- MODAL DE DOAÇÃO -->
+    <!-- MODAL PERFIL -->
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal">
+            <button class="btn-close" onclick="document.getElementById('profile-modal').classList.remove('active')">✕</button>
+            <div class="profile-header">
+                <div class="profile-avatar">👤</div>
+                <div class="profile-name" id="profile-name-display">Usuário</div>
+                <div class="profile-level" id="profile-level-display">Nível 1 • 0 XP</div>
+            </div>
+            <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="DataManager.export()">📥 Exportar Progresso</button>
+            <label class="btn-secondary" style="display: block; text-align: center; cursor: pointer; width: 100%; margin-bottom: 8px;">
+                📤 Importar Progresso
+                <input type="file" accept=".json" style="display: none;" onchange="DataManager.import(event)">
+            </label>
+            <button class="btn-secondary" style="width: 100%; border-color: var(--danger); color: var(--danger); margin-bottom: 8px;" onclick="Auth.logout()">Sair da Conta</button>
+            <button class="btn-secondary" style="width: 100%;" onclick="Auth.resetProgress()">Zerar Progresso</button>
+        </div>
+    </div>
+
+    <!-- MODAL DOAÇÃO -->
     <div class="modal-overlay" id="donate-modal">
-        <div class="modal" style="max-width: 400px;">
-            <!-- Botão de Fechar X -->
+        <div class="modal">
             <button class="btn-close" onclick="document.getElementById('donate-modal').classList.remove('active')">✕</button>
-            
-            <h2>Apoie o Projeto ☕</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; margin-bottom: 1.5rem; line-height: 1.5;">
-                Se este material te ajudou a aprender algo novo, considere me pagar um café! Sua contribuição me incentiva a continuar criando conteúdo de qualidade e mantendo o projeto gratuito.
-            </p>
-
-            <!-- Foto do QR Code -->
-            <div style="text-align: center; margin-bottom: 1.5rem;">
-                <img src="qrcode.jpeg" alt="QR Code PIX" style="width: 150px; height: 150px; border-radius: 12px; border: 1px solid var(--border); object-fit: cover; padding: 4px; background: #fff;">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 1.1rem;">Apoie o Projeto ☕</h2>
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem;">Sua contribuição me incentiva a continuar criando conteúdo de qualidade!</p>
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <img src="qrcode.jpeg" alt="QR Code" style="width: 120px; border-radius: 8px; border: 1px solid var(--border); background: #fff;">
             </div>
-
-            <!-- Chave 1: Aleatória -->
-            <div class="input-group" style="margin-bottom: 1rem;">
-                <label style="display: flex; justify-content: space-between;">
-                    Chave Aleatória
-                </label>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" id="pix-key-1" value="de9009bc-6ace-4f5c-944d-370e1e28eff0" readonly style="font-size: 0.75rem; cursor: text; padding: 8px;">
-                    <button class="btn-primary" style="flex: none; width: 80px; padding: 0; font-size: 0.8rem; background: var(--border); color: var(--text-main);" onclick="UI.copyPix('pix-key-1', this)">Copiar</button>
+            <div class="input-group">
+                <label>Chave Aleatória</label>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" value="de9009bc-6ace-4f5c-944d-370e1e28eff0" readonly style="font-size: 0.75rem;">
+                    <button class="btn-primary" style="flex: none; padding: 0 10px; font-size: 0.75rem;" onclick="UI.copyPix(this, 'de9009bc-6ace-4f5c-944d-370e1e28eff0')">Copiar</button>
                 </div>
             </div>
-
-            <!-- Chave 2: Fixa (Email) -->
-            <div class="input-group" style="margin-bottom: 1.5rem;">
-                <label style="display: flex; justify-content: space-between;">
-                    Chave Fixa (Email)
-                </label>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" id="pix-key-2" value="tauamiguel77@gmail.com" readonly style="font-size: 0.85rem; cursor: text; padding: 8px;">
-                    <button class="btn-primary" style="flex: none; width: 80px; padding: 0; font-size: 0.8rem; background: var(--border); color: var(--text-main);" onclick="UI.copyPix('pix-key-2', this)">Copiar</button>
+            <div class="input-group">
+                <label>Chave Fixa (Email)</label>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" value="tauamiguel77@gmail.com" readonly style="font-size: 0.8rem;">
+                    <button class="btn-primary" style="flex: none; padding: 0 10px; font-size: 0.75rem;" onclick="UI.copyPix(this, 'tauamiguel77@gmail.com')">Copiar</button>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <button class="btn-secondary" style="width: 100%;" onclick="document.getElementById('donate-modal').classList.remove('active')">
-                Voltar para os estudos
-            </button>
+    <!-- MODAL CERTIFICADO -->
+    <div class="modal-overlay" id="cert-modal">
+        <div class="modal">
+            <button class="btn-close" onclick="document.getElementById('cert-modal').classList.remove('active')">✕</button>
+            <h2 style="text-align: center; color: var(--success); font-size: 1.1rem;">🎓 Parabéns!</h2>
+            <p style="text-align: center; margin: 0.5rem 0 1rem 0; font-size: 0.85rem;">Você concluiu a trilha com sucesso!</p>
+            <canvas id="cert-canvas" width="400" height="280" style="width: 100%; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 1rem;"></canvas>
+            <a id="download-cert" class="btn-primary" style="display: block; text-align: center; text-decoration: none; padding: 8px; font-size: 0.85rem;">Baixar Certificado</a>
         </div>
     </div>
 
     <script>
         // =====================================================================
-        // 🌓 GERENCIADOR DE TEMAS
+        // 📚 BANCO DE DADOS EXPANDIDO (EXEMPLOS E DESAFIOS RICOS)
         // =====================================================================
-        const Theme = {
-            init: () => {
-                const saved = localStorage.getItem('@DevJourney:theme') || 'dark';
-                document.documentElement.setAttribute('data-theme', saved);
-            },
-            toggle: () => {
-                const current = document.documentElement.getAttribute('data-theme');
-                const target = current === 'light' ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', target);
-                localStorage.setItem('@DevJourney:theme', target);
-                Prism.highlightAll(); 
-            }
-        };
-
-        // =====================================================================
-        // ⏳ TELA DE LOADING
-        // =====================================================================
-        const Loader = {
-            messages: [
-                "Iniciando sistema...",
-                "Carregando módulos de JavaScript...",
-                "Conectando ao banco de dados...",
-                "Preparando ambiente de estudos...",
-                "Quase pronto!"
-            ],
-            init: () => {
-                let index = 0;
-                const textEl = document.getElementById('loading-text');
-                
-                const interval = setInterval(() => {
-                    textEl.innerText = Loader.messages[index];
-                    index++;
-                    if(index >= Loader.messages.length) {
-                        clearInterval(interval);
-                        setTimeout(() => {
-                            const screen = document.getElementById('loader-screen');
-                            screen.style.opacity = '0';
-                            setTimeout(() => {
-                                screen.style.display = 'none';
-                                UI.init(); 
-                            }, 500); 
-                        }, 800);
-                    }
-                }, 800); 
-            }
-        };
-
-        // =====================================================================
-        // 📚 BANCO DE DADOS (CURRÍCULO)
-        // =====================================================================
-        const Curriculum = [
+        const Tracks = [
             {
-                id: "mod1",
-                title: "Módulo 1: Fundamentos",
+                id: "track_js",
+                title: "JavaScript Backend",
+                desc: "Do zero absoluto ao domínio de lógica, arrays, objetos e assincronismo.",
+                icon: "🟨",
                 level: "Básico",
-                status: "aberto",
-                moduleDesc: "Aqui é onde tudo começa. Neste módulo, você vai aprender como o computador pensa. Não se preocupe com arquiteturas complexas ainda. O objetivo é fazer você entender como guardar dados na memória, tomar decisões simples e repetir tarefas.",
-                lessons: [
-                    { id: "aula01", title: "01. Variáveis e Escopo", concept: "Variáveis são espaços alocados na memória. Usamos <code>const</code> para valores fixos e <code>let</code> para valores mutáveis. O <code>var</code> caiu em desuso por problemas de escopo.", example: "Pense no inventário. <code>const</code> é sua classe (Mago). <code>let</code> é seu HP (pode mudar).", code: `const classe = "Mago";\nlet hp = 100;\nhp = hp - 30;\nconsole.log(\`Classe: \${classe} | HP: \${hp}\`);`, output: "Classe: Mago | HP: 70" },
-                    { id: "aula02", title: "02. Tipos e Operadores", concept: "O JS não é fortemente tipado. Somar string com número concatena. Sempre converta com <code>Number()</code> antes de calcular.", example: "Se a API manda o dano como texto '50' e você soma com a defesa 20, o jogador leva '5020' de dano (Bug).", code: `const danoString = "50";\nconst defesa = 20;\nconsole.log(danoString + defesa); // "5020"\nconst danoReal = Number(danoString) - defesa;\nconsole.log(danoReal); // 30`, output: "5020\n30" },
-                    { id: "aula03", title: "03. Controle de Fluxo", concept: "O cérebro do código. <code>if</code>, <code>else if</code>, <code>else</code> combinados com <code>&&</code> (E) e <code>||</code> (OU).", example: "Para entrar na ranqueada, precisa ter Nível >= 10 <strong>E</strong> ter o jogo original.", code: `const nivel = 15;\nconst temJogo = true;\nif (nivel >= 10 && temJogo) {\n  console.log("✅ Entrando na fila...");\n}`, output: "✅ Entrando na fila..." },
-                    { id: "aula04", title: "04. Loops", concept: "Automação. O <code>for</code> itera um número conhecido de vezes. O <code>while</code> roda até a condição falhar.", example: "Spawnar 3 inimigos no mapa usando um loop for em vez de copiar e colar o código 3 vezes.", code: `for (let i = 1; i <= 3; i++) {\n  console.log(\`Inimigo \${i} spawnado!\`);\n}`, output: "Inimigo 1 spawnado!\nInimigo 2 spawnado!\nInimigo 3 spawnado!" },
-                    { id: "aula05", title: "05. Funções", concept: "Blocos de código que só rodam quando chamados. Recebem parâmetros e devolvem <code>return</code>.", example: "Máquina de café. Ingredientes entram, café sai. Evita reescrever a fórmula de dano toda hora.", code: `const calcularDano = (atk, mult) => {\n  return atk * mult;\n};\nconsole.log(calcularDano(100, 2.5));`, output: "250" },
-                    { id: "aula06", title: "06. Arrays", concept: "Estruturas indexadas que guardam múltiplos valores. Métodos: <code>.push()</code>, <code>.length</code>.", example: "O inventário do jogador. Ao pegar um novo loot, usa-se <code>.push()</code>.", code: `const inventario = ["Faca", "Pistola"];\ninventario.push("Rifle");\nconsole.log(\`Itens: \${inventario}\`);`, output: "Itens: Faca,Pistola,Rifle" },
-                    { id: "aula07", title: "07. Objetos", concept: "Agrupam propriedades (chave-valor). Representação de entidades do mundo real.", example: "Uma API devolve o jogador como Objeto: <code>{ nome: \"Faker\", elo: \"Desafiante\" }</code>.", code: `const jogador = {\n  nick: "Faker",\n  funcao: "Mid"\n};\nconsole.log(\`O jogador \${jogador.nick} joga de \${jogador.funcao}.\`);`, output: "O jogador Faker joga de Mid." },
-                    { id: "aula08", title: "08. Higher-Order Functions", concept: "<code>.map()</code> transforma, <code>.filter()</code> filtra, <code>.reduce()</code> acumula. O segredo do backend.", example: "A Riot usa <code>.filter()</code> para pegar jogadores com KDA > 10 (suspeitos de cheat).", code: `const jogadores = [\n  { nome: "Ana", kda: 1.2 },\n  { nome: "Hacker", kda: 15.0 }\n];\nconst suspeitos = jogadores.filter(j => j.kda > 10);\nconsole.log(suspeitos);`, output: "[ { nome: 'Hacker', kda: 15 } ]" },
-                    { id: "aula09", title: "09. Try/Catch", concept: "Se um erro ocorrer, o programa inteiro não pode cair. O <code>catch</code> intercepta e evita o crash.", example: "Lendo um JSON de save corrompido. Com try/catch, retorna erro amigável em vez de derrubar o servidor.", code: `try {\n  throw new Error("Falha no save");\n} catch (erro) {\n  console.log(\`❌ \${erro.message}\`);\n}`, output: "❌ Falha no save" },
-                    { id: "aula10", title: "10. Async / Await", concept: "O JS não espera requisições terminarem. O <code>await</code> pausa a função <code>async</code> até a Promise retornar.", example: "Ao clicar em 'Entrar na Partida', o servidor demora 1-2s. O site não congela, usa <code>await</code>.", code: `async function carregarPerfil() {\n  const dados = await buscarRanking();\n  console.log(dados.elo);\n}`, output: "Desafiante" }
+                modules: [
+                    {
+                        id: "mod1", title: "Módulo 1: Fundamentos", level: "Básico",
+                        lessons: [
+                            { id: "aula01", title: "01. Variáveis e Escopo", concept: "Variáveis são caixas na memória. Usamos <code>const</code> para valores imutáveis e <code>let</code> para mutáveis. O <code>var</code> vaza escopo de bloco e causa bugs graves em projetos grandes.", exampleTitle: "O Inventário do Jogo", exampleDesc: "Criamos uma constante (imutável) para o nome do jogador, pois ele não muda no meio da partida. Criamos uma variável (mutável) para o HP, que sofre subtração ao levar dano.", code: `const jogador = "Faker";\nlet hp = 100;\n\n// O jogador tomou 30 de dano\nhp = hp - 30; \n\nconsole.log("Jogador: " + jogador);\nconsole.log("HP Restante: " + hp);`, output: "Jogador: Faker\nHP Restante: 70" },
+                            { id: "aula02", title: "02. Tipos e Conversão", concept: "O JS tenta adivinhar tipos. Somar texto com número gera concatenação (junta tudo). Use <code>Number()</code> ou <code>parseInt()</code> para forçar o tipo numérico e evitar bugs matemáticos.", exampleTitle: "A Armadilha da API", exampleDesc: "O backend enviou o dano como texto ('50'). Se somarmos com a defesa (20), o resultado vira '5020' (erro grave). Usamos <code>Number()</code> para converter e calcular corretamente.", code: `const danoString = "50";\nconst defesa = 20;\n\nconsole.log(danoString + defesa); // "5020"\n\nconst danoReal = Number(danoString) - defesa;\nconsole.log(danoReal);`, output: "5020\n30" },
+                            { id: "aula03", title: "03. Condicionais (If/Else)", concept: "O cérebro do código. Usamos <code>if</code> e <code>else</code> combinados com operadores lógicos <code>&&</code> (E) e <code>||</code> (OU). Para casos com muitas opções, usamos <code>switch case</code>.", exampleTitle: "Matchmaking Ranqueado", exampleDesc: "Para entrar na ranqueada, o jogador precisa ter Nível >= 10 E ter comprado o jogo original. Se ele falhar em qualquer uma, cai no else e é bloqueado.", code: `const nivel = 15;\nconst temJogo = true;\n\nif (nivel >= 10 && temJogo) {\n    console.log("✅ Entrando na fila...");\n} else {\n    console.log("❌ Acesso negado.");\n}`, output: "✅ Entrando na fila..." },
+                            { id: "aula04", title: "04. Loops (For/While)", concept: "Automação. O laço <code>for</code> repete um bloco um número conhecido de vezes. O <code>while</code> repete até a condição falhar (útil quando não se sabe o limite).", exampleTitle: "Spawnando Inimigos", exampleDesc: "Em vez de copiar o código 3 vezes para criar 3 inimigos, usamos um loop for que começa em 1 e vai até 3, executando o console.log a cada iteração.", code: `for (let i = 1; i <= 3; i++) {\n    console.log("Inimigo " + i + " spawnado!");\n}`, output: "Inimigo 1 spawnado!\nInimigo 2 spawnado!\nInimigo 3 spawnado!" }
+                        ]
+                    },
+                    {
+                        id: "mod2", title: "Módulo 2: Estruturas de Dados", level: "Intermediário",
+                        lessons: [
+                            { id: "aula05", title: "05. Funções e Parâmetros", concept: "Funções são blocos reutilizáveis. Arrow functions (<code>=></code>) são mais curtas. Parâmetros padrão evitam erros caso o dado não seja enviado.", exampleTitle: "Calculadora de Dano", exampleDesc: "Criamos uma máquina que multiplica ataque pelo multiplicador crítico. Se o multiplicador não for enviado, assume 1 (dano normal).", code: `const calcDano = (atk, mult = 1) => {\n    return atk * mult;\n};\n\nconsole.log("Normal: " + calcDano(100));\nconsole.log("Crítico: " + calcDano(100, 2.5));`, output: "Normal: 100\nCrítico: 250" },
+                            { id: "aula06", title: "06. Arrays (Listas)", concept: "Listas ordenadas. O índice começa no 0. Métodos essenciais: <code>push</code> (adiciona fim), <code>unshift</code> (início), <code>pop</code> (remove fim), <code>length</code> (tamanho).", exampleTitle: "Mochila do Jogador", exampleDesc: "Começamos com uma mochila. Adicionamos um Rifle no final e uma Poção no início. Por fim, removemos o último item.", code: `const inv = ["Faca", "Pistola"];\ninv.push("Rifle"); // Adiciona no fim\ninv.unshift("Poção"); // Adiciona no início\n\nconsole.log(inv);\nconsole.log("Total: " + inv.length);`, output: "['Poção', 'Faca', 'Pistola', 'Rifle']\nTotal: 4" },
+                            { id: "aula07", title: "07. Objetos (Entidades)", concept: "Agrupam dados no formato chave-valor. Perfeitos para representar fichas de jogador, configurações e respostas de API.", exampleTitle: "Ficha da API", exampleDesc: "O objeto agrupa todas as informações do jogador em uma única variável. Podemos acessar os dados por notação de ponto (perfil.nick).", code: `const perfil = {\n    nick: "Faker",\n    funcao: "Mid",\n    elo: "Desafiante"\n};\n\nconsole.log(\`O \${perfil.nick} joga de \${perfil.funcao}\`);\nconsole.log("Elo: " + perfil.elo);`, output: "O Faker joga de Mid\nElo: Desafiante" }
+                        ]
+                    },
+                    {
+                        id: "mod3", title: "Módulo 3: Lógica Avançada", level: "Avançado",
+                        lessons: [
+                            { id: "aula08", title: "08. Higher-Order (Map/Filter)", concept: "O padrão da indústria. <code>.filter()</code> cria um novo array apenas com itens aprovados no teste. <code>.map()</code> transforma cada item do array.", exampleTitle: "Auditoria Anticheat", exampleDesc: "Filtramos a lista de jogadores pegando apenas quem tem KDA > 10 (suspeitos). Depois, mapeamos o resultado para extrair apenas os nomes (strings).", code: `const jogadores = [\n    { nome: "Ana", kda: 1.2 },\n    { nome: "Hacker", kda: 15.0 },\n    { nome: "Bia", kda: 3.0 }\n];\n\nconst suspeitos = jogadores.filter(j => j.kda > 10);\nconst nomes = suspeitos.map(j => j.nome);\n\nconsole.log("Banidos: " + nomes);`, output: "Banidos: Hacker" },
+                            { id: "aula09", title: "09. Tratamento de Erros", concept: "Se um erro ocorrer (ex: ler um arquivo inexistente), o sistema não pode quebrar. O bloco <code>try</code> tenta rodar. O <code>catch</code> captura a falha e evita o crash.", exampleTitle: "Save Corrompido", exampleDesc: "Simulamos a leitura de um save do jogo. Se o arquivo estiver corrompido, o código lança um erro e o catch avisa o usuário amigavelmente.", code: `try {\n    // Simulando erro\n    throw new Error("Arquivo corrompido");\n} catch (erro) {\n    console.log("❌ Falha: " + erro.message);\n}`, output: "❌ Falha: Arquivo corrompido" },
+                            { id: "aula10", title: "10. Async / Await (API)", concept: "O JS não espera operações lentas (como internet). O <code>async/await</code> pausa a função até a Promise retornar. Isso evita que a tela do usuário congele.", exampleTitle: "Carregando Perfil", exampleDesc: "Simulamos uma requisição que demora 1 segundo para buscar o status no servidor usando uma Promise e setTimeout.", code: `async function carregar() {\n    console.log("Buscando dados...");\n    const status = await new Promise(r => setTimeout(() => r("Desconectado"), 1000));\n    console.log("Status: " + status);\n}\ncarregar();`, output: "Buscando dados...\n(espera 1s)\nStatus: Desconectado" }
+                        ]
+                    },
+                    {
+                        id: "mod4", title: "Módulo 4: Desafios Backend", level: "Prática",
+                        lessons: [
+                            { id: "ex01", title: "Desafio 01. Calculadora de KDA", concept: "Crie uma função que calcula o KDA (Kills + Assists / Deaths). Se as mortes forem 0, use Math.max para não dividir por zero.", exampleTitle: "Evitando Infinity", exampleDesc: "Se o jogador não morreu, a divisão por 0 gera Infinity. Usamos Math.max(deaths, 1) para garantir o cálculo seguro.", code: `const calcKDA = (k, a, d) => {\n    return (k + a) / Math.max(d, 1);\n};\nconsole.log(calcKDA(10, 5, 0));`, output: "15" },
+                            { id: "ex02", title: "Desafio 02. Filtro de Banidos", concept: "Use filter para achar jogadores com mais de 5 reports e use map para extrair os IDs deles.", exampleTitle: "Lista de Banimentos", exampleDesc: "O sistema do jogo precisa enviar a lista de IDs para o servidor de banimentos.", code: `const players = [\n  { id: 1, reports: 2 },\n  { id: 2, reports: 8 },\n  { id: 3, reports: 6 }\n];\nconst banidos = players.filter(p => p.reports > 5).map(p => p.id);\nconsole.log(banidos);`, output: "[ 2, 3 ]" },
+                            { id: "ex03", title: "Desafio 03. Maior Kill Streak", concept: "Encontre o maior número em um array de kill streaks usando um loop for.", exampleTitle: "O Recordista", exampleDesc: "Percorremos o array comparando cada número com o maior atual.", code: `const streaks = [3, 7, 2, 15, 8];\nlet maior = 0;\nfor (let s of streaks) {\n  if (s > maior) maior = s;\n}\nconsole.log("Maior streak: " + maior);`, output: "Maior streak: 15" },
+                            { id: "ex04", title: "Desafio 04. Validação de Login", concept: "Use try/catch para garantir que o usuário enviou o email e a senha, senão lance um erro.", exampleTitle: "Segurança Básica", exampleDesc: "Se a API mandar dados vazios, o servidor deve capturar o erro antes de salvar no banco.", code: `function login(email, senha) {\n  if (!email || !senha) throw new Error("Dados incompletos");\n  return "Logado";\n}\ntry {\n  console.log(login("", "123"));\n} catch (e) {\n  console.log(e.message);\n}`, output: "Dados incompletos" },
+                            { id: "ex05", title: "Desafio 05. Async Timeout", concept: "Simule o tempo de resposta de um servidor usando Promise e setTimeout.", exampleTitle: "Ping do Servidor", exampleDesc: "O código espera 2 segundos e depois imprime a latência calculada.", code: `async function ping() {\n  await new Promise(r => setTimeout(r, 2000));\n  console.log("Ping: 15ms");\n}\nping();`, output: "(espera 2s)\nPing: 15ms" }
+                        ]
+                    }
                 ]
-            },
-            {
-                id: "mod2",
-                title: "Módulo 2: Prática",
-                level: "Iniciante",
-                status: "aberto",
-                moduleDesc: "A teoria sem prática é inútil. Neste módulo, você vai aplicar tudo o que aprendeu no Módulo 1 em desafios reais. O objetivo não é apenas fazer o código rodar, mas sim fazer do jeito mais limpo possível.",
-                lessons: [
-                    { id: "ex01", title: "Ex 01. Ficha de Jogador", concept: "Crie variáveis com nome, idade e jogo favorito e imprima usando template strings.", example: "Juntar informações de texto numa frase só usando a crase (``).", code: `const nick = "Tauã";\nconst rank = "Global Elite";\nconsole.log(\`O jogador \${nick} está no rank \${rank}.\`);`, output: "O jogador Tauã está no rank Global Elite." },
-                    { id: "ex02", title: "Ex 02. Cálculo de Dano", concept: "Calcule dano (ataque - defesa). Se for negativo, retorne 'Bloqueado'.", example: "Lógica simples de mitigação de dano em RPGs.", code: `const ataque = 50; const defesa = 80;\nconst dano = ataque - defesa;\nif (dano <= 0) {\n  console.log("Dano Bloqueado");\n} else {\n  console.log(\`Dano de \${dano}\`);\n}`, output: "Dano Bloqueado" },
-                    { id: "ex03", title: "Ex 03. Rank de Notas", concept: "Notas >= 9 (MVP), >= 7 (Bom), resto (Treinar).", example: "Sistema de rankeamento baseado em performance.", code: `const nota = 8.5;\nif (nota >= 9) console.log("MVP");\nelse if (nota >= 7) console.log("Bom Jogador");\nelse console.log("Precisa treinar");`, output: "Bom Jogador" },
-                    { id: "ex04", title: "Ex 04. FizzBuzz Gamer", concept: "Loop de 1 a 50. Múltiplos de 5 imprimem 'Fizz'.", example: "Teste clássico de lógica e uso do operador de resto (%).", code: `for (let i = 1; i <= 50; i++) {\n  if (i % 5 === 0) console.log("Fizz");\n  else console.log(i);\n}`, output: "1, 2, 3, 4, Fizz, 6, 7, 8, 9, Fizz..." },
-                    { id: "ex05", title: "Ex 05. Imposto de Renda", concept: "Função que calcula 15% se salário > 3000, senão 0.", example: "Uso de arrow function com operador ternário.", code: `const calcularIR = (salario) => salario > 3000 ? salario * 0.15 : 0;\nconsole.log(calcularIR(5000));`, output: "750" },
-                    { id: "ex06", title: "Ex 06. Média de Partidas", concept: "Array de notas, loop para somar e cálculo de média.", example: "Análise de performance em múltiplas partidas.", code: `const notas = [10, 5, 8, 2, 9];\nlet soma = 0;\nfor (let n of notas) soma += n;\nconsole.log(\`Média: \${soma / notas.length}\`);`, output: "Média: 6.8" },
-                    { id: "ex07", title: "Ex 07. Engine de Carro", concept: "Objeto carro, alterar boolean 'ligado' e imprimir.", example: "Mutação de estado de um objeto (entidade).", code: `const carro = { marca: "Ford", ligado: false };\ncarro.ligado = true;\nconsole.log("Carro ligado");`, output: "Carro ligado" },
-                    { id: "ex08", title: "Ex 08. Total de Kills", concept: "Usar <code>.reduce()</code> para acumular total de kills.", example: "Somar um array de objetos (dados de equipe) em um único número.", code: `const team = [{k: 10}, {k: 20}, {k: 15}];\nconst total = team.reduce((acc, p) => acc + p.k, 0);\nconsole.log(total);`, output: "45" },
-                    { id: "ex09", title: "Ex 09. Validação de Lobby", concept: "Lançar erro se 'hp' não existir, capturar com try/catch.", example: "Validar se os dados vindos da API estão íntegros.", code: `try {\n  const player = { nome: "Noob" };\n  if (!player.hp) throw new Error("Jogador inválido");\n} catch (e) {\n  console.log(e.message);\n}`, output: "Jogador inválido" },
-                    { id: "ex10", title: "Ex 10. Fetch API (Mock)", concept: "Async/await com setTimeout e Promise.", example: "Simular a latência de rede ao buscar o perfil de um jogador.", code: `const getUser = () => new Promise(r => setTimeout(() => r({ nick: "Faker" }), 1000));\nasync function main() {\n  const user = await getUser();\n  console.log(user.nick);\n}\nmain();`, output: "Faker (após 1s)" }
-                ]
-            },
-            {
-                id: "mod3",
-                title: "Módulo 3: Avançado",
-                level: "Intermediário",
-                status: "bloqueado",
-                lessons: []
             }
         ];
 
-        // =====================================================================
-        // 🗄️ MOCK DATABASE (LOCALSTORAGE)
-        // =====================================================================
-        const DB = {
+        const DataManager = {
             getUsers: () => JSON.parse(localStorage.getItem('@DevJourney:users')) || {},
-            saveUsers: (users) => localStorage.setItem('@DevJourney:users', JSON.stringify(users)),
+            saveUsers: (u) => localStorage.setItem('@DevJourney:users', JSON.stringify(u)),
             getSession: () => JSON.parse(localStorage.getItem('@DevJourney:session')),
-            saveSession: (user) => localStorage.setItem('@DevJourney:session', JSON.stringify(user)),
-            logout: () => localStorage.removeItem('@DevJourney:session')
-        };
-
-        // =====================================================================
-        // 🔐 AUTENTICAÇÃO
-        // =====================================================================
-        const Auth = {
-            register: () => {
-                const user = document.getElementById('login-user').value;
-                const pass = document.getElementById('login-pass').value;
-                if (!user || !pass) return alert("Preencha todos os campos!");
-                const users = DB.getUsers();
-                if (users[user]) return alert("Usuário já existe!");
-                users[user] = { password: pass, progress: [] };
-                DB.saveUsers(users);
-                alert("Conta criada! Faça login.");
-            },
-            login: () => {
-                const user = document.getElementById('login-user').value;
-                const pass = document.getElementById('login-pass').value;
-                const users = DB.getUsers();
-                if (users[user] && users[user].password === pass) {
-                    DB.saveSession({ username: user });
-                    document.getElementById('login-modal').classList.remove('active');
-                    UI.renderUser(); UI.renderSidebar(); UI.updateProgress();
-                } else { alert("Usuário ou senha incorretos!"); }
-            },
-            logout: () => { DB.logout(); window.location.reload(); }
-        };
-
-        // =====================================================================
-        // 🖥️ INTERFACE DO USUÁRIO (UI)
-        // =====================================================================
-        const UI = {
-            init: () => {
-                UI.renderUser(); UI.renderSidebar(); UI.updateProgress();
-                document.getElementById('btn-start').addEventListener('click', () => {
-                    if (!DB.getSession()) {
-                        document.getElementById('login-modal').classList.add('active');
-                    } else {
-                        const session = DB.getSession();
-                        const progress = DB.getUsers()[session.username].progress;
-                        let nextLesson = null;
-                        let nextMod = null;
-                        for (const mod of Curriculum) {
-                            if (mod.status === 'bloqueado') continue;
-                            for (const lesson of mod.lessons) {
-                                if (!progress.includes(lesson.id)) {
-                                    nextLesson = lesson.id; nextMod = mod.id; break;
-                                }
-                            }
-                            if (nextLesson) break;
-                        }
-                        if (nextLesson) UI.loadLesson(nextLesson, nextMod);
-                        else alert("Você concluiu todo o módulo disponível! Aguarde novos lançamentos.");
-                    }
-                });
-            },
-
-            renderUser: () => {
-                const session = DB.getSession();
-                const container = document.getElementById('user-profile');
-                if (session) {
-                    container.innerHTML = `
-                        <div class="user-info">
-                            <div class="avatar">👤</div>
-                            <div><div class="user-name">${session.username}</div><div class="user-status">Estudante</div></div>
-                        </div>
-                        <button class="btn-login" style="width: auto; background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 4px 8px;" onclick="Auth.logout()">Sair</button>
-                    `;
-                    document.getElementById('progress-container').style.display = 'block';
-                } else {
-                    container.innerHTML = `<button class="btn-login" onclick="document.getElementById('login-modal').classList.add('active')">Fazer Login</button>`;
-                    document.getElementById('progress-container').style.display = 'none';
-                }
-            },
-
-            renderSidebar: () => {
-                const nav = document.getElementById('nav-menu'); nav.innerHTML = '';
-                const session = DB.getSession();
-                const progress = session ? DB.getUsers()[session.username].progress : [];
-
-                Curriculum.forEach(mod => {
-                    const titleEl = document.createElement('div');
-                    titleEl.className = 'module-title';
-                    titleEl.innerHTML = `${mod.title} <span class="badge">${mod.level}</span>`;
-                    nav.appendChild(titleEl);
-
-                    if (mod.status === 'bloqueado') {
-                        const lockEl = document.createElement('div');
-                        lockEl.className = 'nav-item locked';
-                        lockEl.innerHTML = `<span class="icon">🔒</span> Em breve`;
-                        nav.appendChild(lockEl);
-                    } else {
-                        mod.lessons.forEach(lesson => {
-                            const isCompleted = progress.includes(lesson.id);
-                            const el = document.createElement('div');
-                            el.className = `nav-item ${isCompleted ? 'completed' : ''}`;
-                            el.innerHTML = `<span class="icon">${isCompleted ? '✅' : '📄'}</span> ${lesson.title}`;
-                            el.onclick = () => UI.loadLesson(lesson.id, mod.id);
-                            nav.appendChild(el);
-                        });
-                    }
-                });
-            },
-
-            loadLesson: (lessonId, moduleId) => {
-                document.getElementById('hero-screen').style.display = 'none';
-                const screen = document.getElementById('lesson-screen');
-                screen.classList.add('active');
-
-                let lessonData = null; let modData = null;
-                for (const mod of Curriculum) {
-                    const found = mod.lessons.find(l => l.id === lessonId);
-                    if (found) { lessonData = found; modData = mod; break; }
-                }
-                if (!lessonData) return;
-
-                const session = DB.getSession();
-                const isCompleted = session ? DB.getUsers()[session.username].progress.includes(lessonId) : false;
-
-                const safeCode = lessonData.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                
-                screen.innerHTML = `
-                    <div class="level-guide">
-                        <h4>🎯 Objetivo do ${modData.title} (${modData.level})</h4>
-                        <p>${modData.moduleDesc}</p>
-                    </div>
-
-                    <div class="lesson-header">
-                        <span class="lesson-badge">${modData.title} • ${modData.level}</span>
-                        <h1>${lessonData.title}</h1>
-                        <div class="lesson-actions">
-                            <button class="btn-complete ${isCompleted ? 'done' : ''}" onclick="UI.toggleComplete('${lessonId}', '${moduleId}')">
-                                ${isCompleted ? '✅ Concluído' : '🟢 Marcar como Concluído'}
-                            </button>
-                            <button class="btn-download" onclick="UI.downloadCode('${lessonId}', \`${lessonData.code}\`)">
-                                ⬇️ Baixar .js
-                            </button>
-                        </div>
-                    </div>
-                    <div class="info-card"><h3>📖 Conceito</h3><p>${lessonData.concept}</p></div>
-                    <div class="info-card example"><h3>🌍 Assimilação Real</h3><p>${lessonData.example}</p></div>
-                    
-                    <div class="code-wrapper">
-                        <div class="code-header">
-                            <span>${lessonId}.js</span>
-                            <span>VS Code Highlight</span>
-                        </div>
-                        <pre><code class="language-javascript">${safeCode}</code></pre>
-                    </div>
-
-                    <div class="output-block">
-                        <span class="term">$ node ${lessonId}.js</span>
-                        ${lessonData.output.replace(/\n/g, '<br>')}
-                    </div>
-                `;
-
-                Prism.highlightAll();
-            },
-
-            downloadCode: (lessonId, code) => {
-                const rawCode = code.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-                const blob = new Blob([rawCode], { type: 'text/javascript' });
-                const url = URL.createObjectURL(blob);
+            saveSession: (u) => localStorage.setItem('@DevJourney:session', JSON.stringify(u)),
+            logout: () => localStorage.removeItem('@DevJourney:session'),
+            export: () => {
+                const session = DataManager.getSession();
+                const data = JSON.stringify(DataManager.getUsers()[session.username], null, 2);
+                const blob = new Blob([data], { type: 'application/json' });
                 const a = document.createElement('a');
-                a.href = url;
-                a.download = `${lessonId}.js`;
-                document.body.appendChild(a);
+                a.href = URL.createObjectURL(blob);
+                a.download = `progresso_${session.username}.json`;
                 a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                UI.showToast("Download iniciado!", "success");
             },
-
-            copyPix: (inputId, btnElement) => {
-                const input = document.getElementById(inputId);
-                input.select();
-                input.setSelectionRange(0, 99999); 
-                
-                navigator.clipboard.writeText(input.value).then(() => {
-                    const originalText = btnElement.innerText;
-                    btnElement.innerText = "✓ Copiado";
-                    btnElement.style.background = "var(--success)";
-                    btnElement.style.color = "#fff";
-                    
-                    setTimeout(() => {
-                        btnElement.innerText = originalText;
-                        btnElement.style.background = "var(--border)";
-                        btnElement.style.color = "var(--text-main)";
-                    }, 2000);
-                }).catch(err => {
-                    alert("Erro ao copiar a chave.");
-                });
-            },
-
-            toggleComplete: (lessonId, moduleId) => {
-                const session = DB.getSession();
-                if (!session) return alert("Faça login para salvar seu progresso!");
-
-                const users = DB.getUsers();
-                const user = users[session.username];
-                
-                if (user.progress.includes(lessonId)) user.progress = user.progress.filter(id => id !== lessonId);
-                else user.progress.push(lessonId);
-
-                DB.saveUsers(users);
-                UI.loadLesson(lessonId, moduleId);
-                UI.renderSidebar();
-                UI.updateProgress();
-            },
-
-            updateProgress: () => {
-                const session = DB.getSession();
-                if (!session) return;
-                const progress = DB.getUsers()[session.username].progress;
-                let totalLessons = 0;
-                Curriculum.forEach(m => { if (m.status === 'aberto') totalLessons += m.lessons.length; });
-                const percent = Math.round((progress.length / totalLessons) * 100);
-                document.getElementById('progress-fill').style.width = `${percent}%`;
-                document.getElementById('progress-text').innerText = `${percent}%`;
+            import: (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        const session = DataManager.getSession();
+                        const users = DataManager.getUsers();
+                        users[session.username] = data;
+                        DataManager.saveUsers(users);
+                        UI.showToast("Importado com sucesso!", "success");
+                        setTimeout(() => window.location.reload(), 1500);
+                    } catch (err) {
+                        UI.showToast("Arquivo inválido.", "danger");
+                    }
+                };
+                reader.readAsText(file);
             }
         };
 
-        // Inicializa o Tema e o Loader ao carregar a página
+        const Toast = {
+            show: (msg, type = "primary") => {
+                const container = document.getElementById('toast-container');
+                const el = document.createElement('div');
+                el.className = `toast ${type}`;
+                let icon = "ℹ️"; if(type === "success") icon = "✅"; if(type === "danger") icon = "❌";
+                el.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
+                container.appendChild(el);
+                setTimeout(() => { el.style.animation = "fadeOut 0.3s forwards"; setTimeout(() => el.remove(), 300); }, 3000);
+            }
+        };
+
+        const Auth = {
+            register: () => {
+                const u = document.getElementById('login-user').value;
+                const p = document.getElementById('login-pass').value;
+                if(!u || !p) return Toast.show("Preencha os campos!", "danger");
+                const users = DataManager.getUsers();
+                if(users[u]) return Toast.show("Usuário já existe!", "danger");
+                users[u] = { password: p, progress: [], bookmarks: [], notes: {}, xp: 0, streak: 1, lastLogin: new Date().toDateString() };
+                DataManager.saveUsers(users);
+                Toast.show("Conta criada!", "success");
+            },
+            login: () => {
+                const u = document.getElementById('login-user').value;
+                const p = document.getElementById('login-pass').value;
+                const users = DataManager.getUsers();
+                if(users[u] && users[u].password === p) {
+                    if (users[u].xp === undefined) users[u].xp = 0;
+                    if (users[u].streak === undefined) users[u].streak = 1;
+                    if (users[u].bookmarks === undefined) users[u].bookmarks = [];
+                    if (users[u].notes === undefined) users[u].notes = {};
+                    DataManager.saveUsers(users);
+                    DataManager.saveSession({ username: u });
+                    document.getElementById('login-modal').classList.remove('active');
+                    Auth.checkStreak();
+                    UI.init();
+                    Toast.show(`Bem-vindo, ${u}!`, "success");
+                } else { Toast.show("Dados incorretos!", "danger"); }
+            },
+            checkStreak: () => {
+                const session = DataManager.getSession();
+                if(!session) return;
+                const users = DataManager.getUsers();
+                const user = users[session.username];
+                const today = new Date().toDateString();
+                if(user.lastLogin !== today) {
+                    const last = user.lastLogin ? new Date(user.lastLogin) : null;
+                    const now = new Date();
+                    if(last) {
+                        const diffDays = Math.ceil(Math.abs(now - last) / (1000 * 60 * 60 * 24)); 
+                        if(diffDays === 1) user.streak = (user.streak || 0) + 1;
+                        else if (diffDays > 1) user.streak = 1;
+                    } else { user.streak = 1; }
+                    user.lastLogin = today;
+                    DataManager.saveUsers(users);
+                }
+            },
+            resetProgress: () => {
+                if(!confirm("Apagar todo o progresso?")) return;
+                const session = DataManager.getSession();
+                const users = DataManager.getUsers();
+                users[session.username].progress = [];
+                users[session.username].xp = 0;
+                DataManager.saveUsers(users);
+                UI.init();
+                document.getElementById('profile-modal').classList.remove('active');
+                Toast.show("Progresso zerado.", "success");
+            },
+            logout: () => { DataManager.logout(); window.location.reload(); }
+        };
+
+        let currentTrack = null;
+        let currentLesson = null;
+        let currentModuleId = null;
+
+        const UI = {
+            showToast: (msg, type) => Toast.show(msg, type),
+            init: () => {
+                const session = DataManager.getSession();
+                if(session) { UI.renderUser(); UI.showHub(); } 
+                else {
+                    document.getElementById('login-modal').classList.add('active');
+                    document.getElementById('user-profile').innerHTML = `<button class="btn-primary" onclick="document.getElementById('login-modal').classList.add('active')">Fazer Login</button>`;
+                }
+            },
+            renderUser: () => {
+                const session = DataManager.getSession();
+                if(!session) return;
+                const user = DataManager.getUsers()[session.username];
+                const xp = user.xp || 0; const streak = user.streak || 0;
+                const level = Math.floor(xp / 200) + 1;
+                document.getElementById('user-profile').innerHTML = `
+                    <div class="user-stats">
+                        <div class="stat-item"><div class="stat-value">${level}</div><div class="stat-label">Nível</div></div>
+                        <div class="stat-item"><div class="stat-value">${xp}</div><div class="stat-label">XP</div></div>
+                        <div class="stat-item"><div class="stat-value streak-fire">🔥 ${streak}</div><div class="stat-label">Streak</div></div>
+                    </div>
+                    <button class="btn-sidebar" style="width: 100%;" onclick="UI.openProfile()">⚙️ Meu Perfil</button>
+                `;
+            },
+            openProfile: () => {
+                const session = DataManager.getSession();
+                const user = DataManager.getUsers()[session.username];
+                const level = Math.floor((user.xp || 0) / 200) + 1;
+                document.getElementById('profile-name-display').innerText = session.username;
+                document.getElementById('profile-level-display').innerText = `Nível ${level} • ${user.xp || 0} XP`;
+                document.getElementById('profile-modal').classList.add('active');
+            },
+            showHub: () => {
+                document.body.className = 'in-hub';
+                document.getElementById('hub-screen').style.display = 'block';
+                document.getElementById('encyclopedia-screen').style.display = 'none';
+                document.getElementById('lesson-screen').style.display = 'none';
+                document.getElementById('nav-menu').innerHTML = '<div style="padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Escolha uma trilha ao lado</div>';
+                UI.renderTracks();
+            },
+            showEncyclopedia: () => {
+                document.getElementById('lesson-screen').style.display = 'none';
+                document.getElementById('encyclopedia-screen').style.display = 'block';
+            },
+            backToLesson: () => {
+                document.getElementById('encyclopedia-screen').style.display = 'none';
+                document.getElementById('lesson-screen').style.display = 'block';
+            },
+            renderTracks: () => {
+                const grid = document.getElementById('tracks-grid');
+                grid.innerHTML = '';
+                const session = DataManager.getSession();
+                const userProgress = session ? DataManager.getUsers()[session.username].progress : [];
+                Tracks.forEach(track => {
+                    let totalLessons = 0; track.modules.forEach(m => totalLessons += m.lessons.length);
+                    const completed = track.modules.flatMap(m => m.lessons).filter(l => userProgress.includes(l.id)).length;
+                    const percent = totalLessons === 0 ? 0 : Math.round((completed / totalLessons) * 100);
+                    const card = document.createElement('div'); card.className = 'track-card';
+                    card.innerHTML = `
+                        <div class="track-icon">${track.icon}</div><div class="track-title">${track.title}</div>
+                        <div class="track-desc">${track.desc}</div>
+                        <div class="track-meta"><span class="badge">${track.level}</span><span class="badge">${totalLessons} Aulas</span></div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: ${percent}%"></div></div>
+                        <div style="text-align: right; font-size: 0.75rem; margin-top: 5px; color: var(--text-muted);">${percent}%</div>
+                    `;
+                    card.onclick = () => { if(totalLessons === 0) return Toast.show("Trilha em breve!", "primary"); UI.selectTrack(track); };
+                    grid.appendChild(card);
+                });
+            },
+            selectTrack: (track) => {
+                currentTrack = track; document.body.className = 'in-track';
+                document.getElementById('hub-screen').style.display = 'none';
+                document.getElementById('encyclopedia-screen').style.display = 'none';
+                document.getElementById('lesson-screen').style.display = 'block';
+                UI.renderSidebar(track);
+                const firstMod = track.modules[0];
+                if (firstMod && firstMod.lessons.length > 0) UI.loadLesson(firstMod.lessons[0], firstMod.id);
+            },
+            renderSidebar: (track) => {
+                const nav = document.getElementById('nav-menu'); nav.innerHTML = '';
+                const session = DataManager.getSession();
+                const progress = session ? DataManager.getUsers()[session.username].progress : [];
+                track.modules.forEach(mod => {
+                    const titleEl = document.createElement('div'); titleEl.className = 'module-title'; titleEl.innerText = mod.title;
+                    nav.appendChild(titleEl);
+                    mod.lessons.forEach(lesson => {
+                        const isDone = progress.includes(lesson.id);
+                        const isActive = currentLesson && currentLesson.id === lesson.id;
+                        const el = document.createElement('div');
+                        el.className = `nav-item ${isDone ? 'completed' : ''} ${isActive ? 'active' : ''}`;
+                        el.innerHTML = `<span class="icon">${isDone ? '✅' : '📄'}</span> ${lesson.title}`;
+                        el.onclick = () => UI.loadLesson(lesson, mod.id);
+                        nav.appendChild(el);
+                    });
+                });
+            },
+            filterLessons: (query) => {
+                const items = document.querySelectorAll('.nav-item'); const q = query.toLowerCase();
+                items.forEach(item => { item.style.display = item.innerText.toLowerCase().includes(q) ? 'flex' : 'none'; });
+            },
+            loadLesson: (lesson, moduleId) => {
+                currentLesson = lesson; currentModuleId = moduleId; UI.renderSidebar(currentTrack);
+                const session = DataManager.getSession();
+                const user = DataManager.getUsers()[session.username];
+                const isCompleted = user.progress.includes(lesson.id);
+                const isStarred = user.bookmarks.includes(lesson.id);
+                const note = user.notes[lesson.id] || '';
+                const screen = document.getElementById('lesson-screen');
+                screen.innerHTML = `
+                    <div class="lesson-topbar">
+                        <span class="badge">${currentTrack.title}</span>
+                        <div class="action-btns">
+                            <button class="btn-icon ${isStarred ? 'starred' : ''}" onclick="UI.toggleBookmark('${lesson.id}')">${isStarred ? '★ Favoritado' : '☆ Favoritar'}</button>
+                        </div>
+                    </div>
+                    <div class="lesson-header">
+                        <h1>${lesson.title}</h1>
+                        <div class="lesson-actions">
+                            <button class="btn-complete ${isCompleted ? 'done' : ''}" onclick="UI.toggleComplete('${lesson.id}')">
+                                ${isCompleted ? '✅ Concluído' : '🟢 Marcar Concluído (+50 XP)'}
+                            </button>
+                            <button class="btn-download" onclick="UI.downloadCode('${lesson.id}', \`${lesson.code}\`)">⬇️ Baixar .js</button>
+                        </div>
+                    </div>
+                    <div class="info-card"><h3>📖 Conceito</h3><p>${lesson.concept}</p></div>
+                    <div class="info-card example"><h3>🌍 ${lesson.exampleTitle}</h3><p style="margin-bottom: 0.5rem;">${lesson.exampleDesc}</p></div>
+                    <div class="info-card" style="background: var(--bg-base); padding: 0; overflow: hidden;">
+                        <div class="playground-header" style="padding: 10px 15px; margin: 0; background: var(--bg-surface); border-bottom: 1px solid var(--border);">
+                            <h3 style="margin: 0; font-size: 0.9rem;">💻 Playground (Monaco)</h3>
+                            <button class="btn-run" onclick="Playground.run()">▶ Executar</button>
+                        </div>
+                        <div style="padding: 10px;">
+                            <div id="monaco-editor"></div>
+                            <div class="console-output" id="console-output">> Console...</div>
+                        </div>
+                    </div>
+                    <div class="info-card"><h3>📝 Suas Anotações</h3><textarea class="notes-area" id="lesson-notes" onblur="UI.saveNote('${lesson.id}')" placeholder="Anote suas dúvidas...">${note}</textarea></div>
+                `;
+                Playground.init(lesson.code);
+                const totalLessons = currentTrack.modules.flatMap(m => m.lessons).length;
+                const completed = currentTrack.modules.flatMap(m => m.lessons).filter(l => user.progress.includes(l.id)).length;
+                if(totalLessons > 0 && completed === totalLessons) setTimeout(() => UI.generateCert(), 500);
+            },
+            toggleBookmark: (id) => {
+                const session = DataManager.getSession(); const users = DataManager.getUsers(); const user = users[session.username];
+                if(user.bookmarks.includes(id)) user.bookmarks = user.bookmarks.filter(b => b !== id); else user.bookmarks.push(id);
+                DataManager.saveUsers(users); UI.loadLesson(currentLesson, currentModuleId);
+            },
+            saveNote: (id) => {
+                const session = DataManager.getSession(); const users = DataManager.getUsers();
+                users[session.username].notes[id] = document.getElementById('lesson-notes').value;
+                DataManager.saveUsers(users);
+            },
+            toggleComplete: (id) => {
+                const session = DataManager.getSession(); const users = DataManager.getUsers(); const user = users[session.username];
+                if(user.progress.includes(id)) {
+                    user.progress = user.progress.filter(p => p !== id); user.xp = Math.max(0, (user.xp || 0) - 50); Toast.show("Aula desmarcada. -50 XP", "danger");
+                } else {
+                    user.progress.push(id); user.xp = (user.xp || 0) + 50; Toast.show("+50 XP! Continue assim.", "success");
+                }
+                DataManager.saveUsers(users); UI.renderUser(); UI.loadLesson(currentLesson, currentModuleId);
+            },
+            generateCert: () => {
+                const session = DataManager.getSession(); const canvas = document.getElementById('cert-canvas'); const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#18181b'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 10; ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+                ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.font = 'bold 20px Inter'; ctx.fillText("CERTIFICADO DE CONCLUSÃO", 200, 70);
+                ctx.font = '14px Inter'; ctx.fillStyle = '#a1a1aa'; ctx.fillText("Certificamos que", 200, 120);
+                ctx.font = 'bold 24px Inter'; ctx.fillStyle = '#6366f1'; ctx.fillText(session.username, 200, 160);
+                ctx.font = '14px Inter'; ctx.fillStyle = '#a1a1aa'; ctx.fillText(`concluiu a trilha ${currentTrack.title}`, 200, 200);
+                ctx.font = '10px Inter'; ctx.fillText(new Date().toLocaleDateString(), 200, 250);
+                document.getElementById('download-cert').href = canvas.toDataURL("image/png"); document.getElementById('download-cert').download = "certificado.png"; document.getElementById('cert-modal').classList.add('active');
+            },
+            downloadCode: (name, code) => {
+                const blob = new Blob([code], { type: 'text/javascript' }); const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob); a.download = `${name}.js`; a.click(); Toast.show("Download iniciado.", "success");
+            },
+            copyPix: (btn, key) => {
+                navigator.clipboard.writeText(key).then(() => {
+                    const original = btn.innerText; btn.innerText = "✓"; setTimeout(() => btn.innerText = original, 2000); Toast.show("Chave copiada!", "success");
+                });
+            }
+        };
+
+        const Playground = {
+            editor: null,
+            init: (code) => {
+                require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs' }});
+                require(['vs/editor/editor.main'], function() {
+                    if(Playground.editor) Playground.editor.dispose();
+                    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+                    Playground.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
+                        value: code, language: 'javascript', theme: isLight ? 'vs' : 'vs-dark',
+                        minimap: { enabled: false }, fontSize: 13, fontFamily: 'JetBrains Mono',
+                        automaticLayout: true, // RESOLVE O PROBLEMA DO SCROLLBAR DE TAMANHO
+                        scrollBeyondLastLine: false
+                    });
+                });
+            },
+            run: () => {
+                const code = Playground.editor.getValue(); const outputDiv = document.getElementById('console-output'); outputDiv.innerHTML = '';
+                const originalLog = console.log;
+                console.log = (...args) => { outputDiv.innerHTML += args.join(' ') + '<br>'; originalLog(...args); };
+                try { eval(code); } catch (e) { outputDiv.innerHTML += `<span style="color: var(--danger)">Erro: ${e.message}</span>`; }
+                console.log = originalLog;
+            }
+        };
+
+        const Theme = {
+            init: () => { const saved = localStorage.getItem('@DevJourney:theme') || 'dark'; document.documentElement.setAttribute('data-theme', saved); },
+            toggle: () => {
+                const curr = document.documentElement.getAttribute('data-theme'); const target = curr === 'light' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', target); localStorage.setItem('@DevJourney:theme', target);
+                if(Playground.editor) monaco.editor.setTheme(target === 'light' ? 'vs' : 'vs-dark');
+            }
+        };
+
         window.addEventListener('DOMContentLoaded', () => {
             Theme.init();
-            Loader.init();
+            setTimeout(() => {
+                document.getElementById('loader-screen').style.opacity = '0';
+                setTimeout(() => { document.getElementById('loader-screen').style.display = 'none'; UI.init(); }, 400);
+            }, 1200);
         });
     </script>
 </body>
